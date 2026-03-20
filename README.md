@@ -1,4 +1,4 @@
-# VITAL Android
+# VITAL Android 🤖
 
 VITAL is a modern, offline-first health tracking Android application designed to flawlessly match the minimalist and elegant aesthetic of the VITAL Web App. It allows users to meticulously log their daily health metrics, such as weight, blood pressure, and heart rate, with seamless cloud synchronization.
 
