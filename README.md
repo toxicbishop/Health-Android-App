@@ -1,53 +1,156 @@
-# VITAL Android 🤖
+<div align="center">
 
-VITAL is a modern, offline-first health tracking Android application designed to flawlessly match the minimalist and elegant aesthetic of the VITAL Web App. It allows users to meticulously log their daily health metrics, such as weight, blood pressure, and heart rate, with seamless cloud synchronization.
+# 🏥 VITAL Health — Android
 
-## Key Features
+**A premium, offline-first health tracking app built with Jetpack Compose & Supabase**
 
-- **Elegant UI/UX**: Built entirely using Jetpack Compose with a sleek cream-and-black design language.
-- **Typography**: Uses Google's **Playfair Display** (headers) and **Inter** (body) seamlessly rendered via Downloadable Fonts to perfectly mimic the web interface.
-- **Supabase Authentication**: Full email/password login and registration flows built securely on the Supabase V3 Kotlin SDK.
-- **Robust Local Caching**: Fully offline-capable architecture leveraging Android's **Room Database (SQLite)**. Data is securely cached locally so the app runs instantly on launch.
-- **Automatic Session Management**: Integrated with reactive `SessionStatus` streams to handle seamless auto-logins via `SharedPreferences`.
-- **Intelligent Syncing**: A dedicated cloud-sync mechanism that automatically pushes locally queued health logs directly to your Supabase PostgreSQL database.
-- **Smart Form Validation**: Context-aware input fields (like dynamic, multi-field split views for Systolic/Diastolic Blood Pressure) protected by strict regex patterns.
-- **Adaptive Iconography**: Custom-designed, infinitely scalable Android Vector adaptive launcher icon (`favicon.svg` translation).
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.0-purple?logo=kotlin)](https://kotlinlang.org)
+[![Jetpack Compose](https://img.shields.io/badge/Jetpack_Compose-Material_3-blue?logo=jetpackcompose)](https://developer.android.com/jetpack/compose)
+[![Supabase](https://img.shields.io/badge/Supabase-Backend-green?logo=supabase)](https://supabase.com)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-red.svg)](LICENSE)
 
-## Tech Stack
+</div>
 
-- **Language**: Kotlin
-- **UI Framework**: Jetpack Compose (Material 3)
-- **Dependency Injection**: Dagger Hilt
-- **Local Storage**: Room (SQLite)
-- **Network & Cloud**: Supabase Kotlin SDK (v3.0.0) + Ktor Client
-- **Asynchronous Processing**: Kotlin Coroutines & Flows
+---
 
-## Getting Started
+## ✨ Features
+
+### 📊 Health Tracking
+| Feature | Description |
+|---------|-------------|
+| **Weight Logging** | Track weight with kg units, averages & trend charts |
+| **Blood Pressure** | Split systolic/diastolic input, status badges (Normal/Elevated/High) |
+| **Heart Rate** | BPM logging with min/max/avg analytics and status indicators |
+| **Mood Logging** | Emoji-based mood picker (😄😊😐😔😢) with optional notes |
+| **Medication Management** | Mark as taken, add new prescriptions, daily/weekly/custom frequency |
+
+### 🔥 Smart Features
+| Feature | Description |
+|---------|-------------|
+| **Streak Counter** | Tracks consecutive logging days to encourage consistency |
+| **Trend Alerts** | Dismissable warnings for elevated BP or high heart rate |
+| **Refill Countdown** | Tracks remaining pills and days until refill needed |
+| **Doctor Visit Log** | Schedule and track appointments with notes |
+| **Clinical Reports** | Monthly health summary + PDF export with share intent |
+
+### 📈 Trends & Analytics
+- **Week / Month / Year** segmented filtering with real-time recalculation
+- **Date Picker** — filter data from a specific date onward
+- **Weight trend chart** — mini bar visualization with delta tracking
+- **BP & HR analytics** — average values with color-coded status badges
+- **Dynamic Health Insights** — pattern detection (morning vs evening BP, weight direction, HR trends)
+
+### 📓 Journal
+- **Daily health timeline** — chronological, color-coded entries
+- **Free-form health notes** — via floating action button
+- **All log types displayed** — weight, BP, HR, mood, medication, appointments
+
+### ⚙️ Settings & Account
+- **Onboarding flow** — 4-step setup (Welcome → Email/Password → Name → Goals)
+- **Dark Mode** — warm espresso/charcoal palette that complements the light theme
+- **Personal Information** — edit name & profile photo (stored in Supabase Storage)
+- **Health Goals** — target weight, BP, daily steps, water intake
+- **Notification Preferences** — medication reminders, vitals logging, weekly summaries
+- **Cloud Backup/Restore** — sync health logs to/from Supabase PostgreSQL
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| **Language** | Kotlin 2.0 |
+| **UI** | Jetpack Compose (Material 3) |
+| **DI** | Dagger Hilt |
+| **Local DB** | Room (SQLite) |
+| **Cloud** | Supabase Kotlin SDK v3 (Auth, Postgrest, Storage) |
+| **Network** | Ktor Client |
+| **Async** | Kotlin Coroutines & Flows |
+| **PDF** | Android PdfDocument API |
+| **Images** | Coil (async image loading) |
+| **Typography** | Playfair Display + Inter (Google Fonts) |
+
+---
+
+## 🏗️ Architecture
+
+```
+com.vital.health/
+├── data/
+│   ├── local/           # Room DB (HealthLogEntity, HealthLogDao, VitalDatabase)
+│   ├── remote/          # Supabase AuthManager
+│   └── repository/      # HealthRepository (local + cloud sync)
+├── di/                  # Hilt AppModule (Supabase, Room, AuthManager providers)
+├── ui/
+│   ├── screens/         # Compose screens (Dashboard, Auth, Onboarding, Settings, etc.)
+│   ├── theme/           # Color.kt, Theme.kt, Type.kt (dynamic dark/light)
+│   └── viewmodels/      # AuthViewModel, HealthViewModel
+└── MainActivity.kt      # Entry point with auth/onboarding routing
+```
+
+---
+
+## 🚀 Getting Started
 
 ### Prerequisites
 
-- Android Studio (Iguana / Jellyfish or newer)
-- Supabase Project (for Backend as a Service)
+- Android Studio Iguana or newer
+- JDK 17+
+- A [Supabase](https://supabase.com) project
+
+### Supabase Setup
+
+1. Create a Supabase project
+2. Enable **Email Auth** in Authentication settings
+3. Create a `health_logs` table:
+   ```sql
+   CREATE TABLE health_logs (
+     id TEXT PRIMARY KEY,
+     logType TEXT NOT NULL,
+     value TEXT NOT NULL,
+     unit TEXT NOT NULL,
+     notes TEXT,
+     timestamp BIGINT NOT NULL,
+     isSynced BOOLEAN DEFAULT TRUE
+   );
+   ```
+4. Create an `avatars` storage bucket (public)
 
 ### Configuration
 
-By default, the application is tightly integrated with a specific Supabase backend. If you wish to use your own Supabase instance, update the configuration keys:
+1. Open `app/src/main/java/com/vital/health/di/AppModule.kt`
+2. Replace `supabaseUrl` and `supabaseKey` with your project credentials
 
-1. Open `app/src/main/java/com/vital/health/di/AppModule.kt`.
-2. Locate the `provideSupabase()` method.
-3. Replace the `supabaseUrl` and `supabaseKey` (Anon Key) parameters with your own project's credentials. Note: Never commit hardcoded production secrets to public version control.
+> ⚠️ **Never commit production secrets to public repositories.**
 
-### Installation & Build
+### Build & Run
 
-1. Open the `/VITAL-Android` folder in Android Studio.
-2. Wait for Gradle to fully sync the updated dependencies (specifically the Hilt logic and Supabase SDKs).
-3. Connect an Android Emulator or a physical device.
-4. Click **Run** (`Shift + F10`) or run the following in your terminal:
-   ```bash
-   ./gradlew assembleDebug
-   adb install -r app/build/outputs/apk/debug/app-debug.apk
-   ```
+```bash
+./gradlew assembleDebug
+adb install -r app/build/outputs/apk/debug/app-debug.apk
+```
 
-## Rate Limits & Testing Note
+Or simply click **Run** (Shift+F10) in Android Studio.
 
-When repeatedly signing up new users during testing, you may encounter a Supabase _Email Rate Limit_. To bypass this, simply navigate to your Supabase Project Settings -> Auth -> Rate Limits, and temporarily increase the limits, or use the "Log In" functionality with pre-created accounts directly from your Supabase Dashboard.
+---
+
+## 🎨 Design
+
+- **Light Mode**: Warm cream (`#F5F3EC`) background with black accents and tan buttons
+- **Dark Mode**: Espresso charcoal (`#1A1714`) with warm off-white text — no jarring blues
+- **Typography**: Playfair Display for headings, Inter for body text
+- **Iconography**: Custom adaptive vector launcher icon
+
+---
+
+## 📝 Testing Note
+
+When repeatedly signing up during testing, you may hit Supabase's **Email Rate Limit**. To work around this:
+- Go to Supabase Dashboard → Auth → Rate Limits and increase temporarily
+- Or log in with pre-created accounts from the Supabase Dashboard
+
+---
+
+## 📄 License
+
+This project is licensed under the **GNU General Public License v3.0** — see the [LICENSE](LICENSE) file for details.
