@@ -25,15 +25,22 @@ import com.vital.health.data.local.HealthLogEntity
 import com.vital.health.ui.theme.*
 import java.util.*
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VitalsScreenContent(logs: List<HealthLogEntity> = emptyList()) {
     var selectedPeriod by remember { mutableStateOf("Week") }
     val periods = listOf("Week", "Month", "Year")
+    var showDatePicker by remember { mutableStateOf(false) }
+    var customDateMillis by remember { mutableStateOf<Long?>(null) }
     
-    val cutoff = when (selectedPeriod) {
-        "Week" -> System.currentTimeMillis() - (7L * 24 * 60 * 60 * 1000)
-        "Month" -> System.currentTimeMillis() - (30L * 24 * 60 * 60 * 1000)
-        else -> System.currentTimeMillis() - (365L * 24 * 60 * 60 * 1000)
+    val cutoff = if (customDateMillis != null) {
+        customDateMillis!!
+    } else {
+        when (selectedPeriod) {
+            "Week" -> System.currentTimeMillis() - (7L * 24 * 60 * 60 * 1000)
+            "Month" -> System.currentTimeMillis() - (30L * 24 * 60 * 60 * 1000)
+            else -> System.currentTimeMillis() - (365L * 24 * 60 * 60 * 1000)
+        }
     }
     val filtered = logs.filter { it.timestamp >= cutoff }
     val weightLogs = filtered.filter { it.logType == "WEIGHT" }
@@ -71,6 +78,46 @@ fun VitalsScreenContent(logs: List<HealthLogEntity> = emptyList()) {
         else -> TextMuted
     }
 
+    // Date picker subtitle
+    val subtitleText = if (customDateMillis != null) {
+        "From ${java.text.SimpleDateFormat("MMM d, yyyy", java.util.Locale.getDefault()).format(java.util.Date(customDateMillis!!))}"
+    } else {
+        "Analytics & Insights"
+    }
+
+    // Date Picker Dialog
+    if (showDatePicker) {
+        val datePickerState = rememberDatePickerState()
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let { customDateMillis = it }
+                    showDatePicker = false
+                }) { Text("OK", color = PrimaryBlack) }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    customDateMillis = null
+                    showDatePicker = false
+                }) { Text("Clear", color = TextMuted) }
+            },
+            colors = DatePickerDefaults.colors(containerColor = CreamCard)
+        ) {
+            DatePicker(state = datePickerState, colors = DatePickerDefaults.colors(
+                containerColor = CreamCard,
+                titleContentColor = TextMain,
+                headlineContentColor = TextMain,
+                weekdayContentColor = TextMuted,
+                dayContentColor = TextMain,
+                selectedDayContainerColor = PrimaryBlack,
+                selectedDayContentColor = CreamBg,
+                todayContentColor = PrimaryBlack,
+                todayDateBorderColor = PrimaryBlack
+            ))
+        }
+    }
+
     Column(
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
@@ -78,9 +125,13 @@ fun VitalsScreenContent(logs: List<HealthLogEntity> = emptyList()) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             Column {
                 Text("Health Trends", style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold), color = TextMain)
-                Text("Analytics & Insights", style = MaterialTheme.typography.bodyMedium, color = TextMuted)
+                Text(subtitleText, style = MaterialTheme.typography.bodyMedium, color = TextMuted)
             }
-            Box(modifier = Modifier.size(48.dp).clip(RoundedCornerShape(12.dp)).border(1.dp, TanButton, RoundedCornerShape(12.dp)), contentAlignment = Alignment.Center) {
+            Box(
+                modifier = Modifier.size(48.dp).clip(RoundedCornerShape(12.dp)).border(1.dp, TanButton, RoundedCornerShape(12.dp))
+                    .clickable { showDatePicker = true },
+                contentAlignment = Alignment.Center
+            ) {
                 Icon(Icons.Filled.DateRange, contentDescription = "Calendar", tint = PrimaryBlack)
             }
         }

@@ -42,6 +42,14 @@ w: file:///C:/Code/Repo/App/app/src/main/java/com/vital/health/ui/screens/Dashbo
 w: file:///C:/Code/Repo/App/app/src/main/java/com/vital/health/ui/screens/DashboardScreen.kt:235:57 'KeyboardArrowRight: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.KeyboardArrowRight
 w: file:///C:/Code/Repo/App/app/src/main/java/com/vital/health/ui/screens/DashboardScreen.kt:340:17 'Divider(Modifier = ..., Dp = ..., Color = ...): Unit' is deprecated. Renamed to HorizontalDivider
 w: file:///C:/Code/Repo/App/app/src/main/java/com/vital/health/ui/screens/DashboardScreen.kt:343:17 'Divider(Modifier = ..., Dp = ..., Color = ...): Unit' is deprecated. Renamed to HorizontalDivider
+w: file:///C:/Code/Repo/App/app/src/main/java/com/vital/health/ui/screens/MedsScreen.kt:42:35 'ArrowBack: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.ArrowBack
+w: file:///C:/Code/Repo/App/app/src/main/java/com/vital/health/ui/screens/SettingsScreen.kt:102:31 'ExitToApp: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.ExitToApp
+w: file:///C:/Code/Repo/App/app/src/main/java/com/vital/health/ui/screens/SettingsScreen.kt:136:31 'ArrowForward: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.ArrowForward
+w: file:///C:/Code/Repo/App/app/src/main/java/com/vital/health/ui/screens/SettingsScreen.kt:139:22 'Divider(Modifier = ..., Dp = ..., Color = ...): Unit' is deprecated. Renamed to HorizontalDivider
+w: file:///C:/Code/Repo/App/app/src/main/java/com/vital/health/ui/screens/SettingsScreen.kt:231:17 'Divider(Modifier = ..., Dp = ..., Color = ...): Unit' is deprecated. Renamed to HorizontalDivider
+w: file:///C:/Code/Repo/App/app/src/main/java/com/vital/health/ui/screens/SettingsScreen.kt:233:17 'Divider(Modifier = ..., Dp = ..., Color = ...): Unit' is deprecated. Renamed to HorizontalDivider
+w: file:///C:/Code/Repo/App/app/src/main/java/com/vital/health/ui/screens/SettingsScreen.kt:235:17 'Divider(Modifier = ..., Dp = ..., Color = ...): Unit' is deprecated. Renamed to HorizontalDivider
+w: file:///C:/Code/Repo/App/app/src/main/java/com/vital/health/ui/screens/SettingsScreen.kt:237:17 'Divider(Modifier = ..., Dp = ..., Color = ...): Unit' is deprecated. Renamed to HorizontalDivider
 
 > Task :app:compileDebugJavaWithJavac UP-TO-DATE
 > Task :app:hiltAggregateDepsDebug UP-TO-DATE
@@ -64,6 +72,6 @@ You can use '--warning-mode all' to show the individual deprecation warnings and
 
 For more on this, please refer to https://docs.gradle.org/9.0.0/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
 
-BUILD SUCCESSFUL in 7s
+BUILD SUCCESSFUL in 8s
 39 actionable tasks: 7 executed, 32 up-to-date
 Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.0.0/userguide/configuration_cache_enabling.html
