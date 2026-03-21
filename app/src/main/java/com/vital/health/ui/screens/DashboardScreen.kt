@@ -236,6 +236,7 @@ fun DashboardScreen(
             
             Spacer(modifier = Modifier.height(32.dp))
         }
+        } // End of conditional else
     }
 }
 
