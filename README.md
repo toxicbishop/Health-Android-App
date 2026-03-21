@@ -98,7 +98,9 @@ The app is built with a separated architecture that isolates UI logic from Data 
 - **DI Layer**: Dagger Hilt manages application-wide dependencies such as database instances and Auth managers.
 - **Entry Point**: `MainActivity` serves as the host for Compose Navigation routing.
 
-![Architecture Diagram](assets/Architecture.svg)
+<div align="center">
+  <img src="assets/Architecture.svg" alt="Architecture Diagram" />
+</div>
 
 > **Want to modify the Architecture Diagram?** 
 > You can download the [`Architecture.drawio`](assets/Architecture.drawio) file from the `assets` directory and use the [Draw.io Integration extension](https://marketplace.visualstudio.com/items?itemName=hediet.vscode-drawio) in VS Code or [app.diagrams.net](https://app.diagrams.net/) to easily view and edit it interactively.
