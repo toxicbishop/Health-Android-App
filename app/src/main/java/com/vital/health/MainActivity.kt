@@ -21,6 +21,9 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val sharedPrefs = getSharedPreferences("vital_prefs", android.content.Context.MODE_PRIVATE)
+        com.vital.health.ui.theme.isAppDarkMode = sharedPrefs.getBoolean("dark_mode", false)
+
         setContent {
             VitalTheme {
                 Surface(
@@ -40,6 +43,10 @@ class MainActivity : ComponentActivity() {
                             logs = logs,
                             userName = authViewModel.userName,
                             userEmail = authViewModel.userEmail ?: "",
+                            userAvatarUrl = authViewModel.userAvatarUrl,
+                            onSaveProfile = { newName, photoBytes ->
+                                authViewModel.updateProfile(newName, photoBytes)
+                            },
                             onAddLog = { type, value, unit, notes ->
                                 viewModel.addLog(type, value, unit, notes)
                             },

@@ -72,6 +72,8 @@ dependencies {
     // Supabase & Ktor
     implementation("io.github.jan-tennert.supabase:postgrest-kt:3.0.0")
     implementation("io.github.jan-tennert.supabase:auth-kt:3.0.0")
+    implementation("io.github.jan-tennert.supabase:storage-kt:3.0.0")
+    implementation("io.coil-kt:coil-compose:2.6.0")
     val ktorVersion = "3.0.0-rc-1"
     implementation("io.ktor:ktor-client-android:$ktorVersion")
     implementation("io.ktor:ktor-client-core:$ktorVersion")

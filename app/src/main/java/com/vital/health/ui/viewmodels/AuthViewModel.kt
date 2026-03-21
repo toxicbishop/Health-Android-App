@@ -1,5 +1,8 @@
 package com.vital.health.ui.viewmodels
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vital.health.data.remote.AuthManager
@@ -32,11 +35,28 @@ class AuthViewModel @Inject constructor(
     val userEmail: String?
         get() = authManager.currentUserEmail()
         
-    val userName: String
-        get() {
-            val email = userEmail ?: return "User"
-            return email.substringBefore("@").replaceFirstChar { it.uppercase() }
+    var userName by mutableStateOf(authManager.currentUserName() ?: (userEmail?.substringBefore("@")?.replaceFirstChar { it.uppercase() } ?: "User"))
+        private set
+        
+    var userAvatarUrl by mutableStateOf(authManager.currentUserAvatar())
+        private set
+
+    fun updateProfile(name: String, photoBytes: ByteArray?) {
+        viewModelScope.launch {
+            try {
+                var newAvatarUrl = userAvatarUrl
+                if (photoBytes != null) {
+                    val fileName = "${authManager.currentUserId()}_avatar.jpg"
+                    newAvatarUrl = authManager.uploadAvatar(photoBytes, fileName)
+                }
+                authManager.updateProfile(name, newAvatarUrl)
+                userName = name
+                userAvatarUrl = newAvatarUrl
+            } catch (e: Exception) {
+                _errorMessage.value = "Failed to update profile: ${e.message}"
+            }
         }
+    }
 
     fun login(email: String, pass: String) {
         viewModelScope.launch {

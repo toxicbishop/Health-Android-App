@@ -53,7 +53,7 @@ fun MedsScreenContent(
                 checked = true,
                 onCheckedChange = { },
                 colors = SwitchDefaults.colors(
-                    checkedThumbColor = Color.White,
+                    checkedThumbColor = CreamBg,
                     checkedTrackColor = PrimaryBlack
                 )
             )
@@ -108,7 +108,7 @@ fun MedsScreenContent(
                         .padding(vertical = 12.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("Daily", color = Color.White, fontWeight = FontWeight.SemiBold)
+                    Text("Daily", color = CreamBg, fontWeight = FontWeight.SemiBold)
                 }
                 Box(
                     modifier = Modifier.weight(1f).padding(vertical = 12.dp),
@@ -145,7 +145,7 @@ fun MedsScreenContent(
             onClick = { },
             modifier = Modifier.fillMaxWidth().height(54.dp),
             shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlack, contentColor = Color.White)
+            colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlack, contentColor = CreamBg)
         ) {
             Text("+ Add New Time", fontWeight = FontWeight.Bold, fontSize = 16.sp)
         }

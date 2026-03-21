@@ -17,16 +17,16 @@
 > Task :app:kspDebugKotlin
 
 > Task :app:compileDebugKotlin
-w: file:///C:/Code/Repo/App/app/src/main/java/com/vital/health/ui/screens/DashboardScreen.kt:35:5 Parameter 'onSync' is never used
-w: file:///C:/Code/Repo/App/app/src/main/java/com/vital/health/ui/screens/DashboardScreen.kt:144:40 'ExitToApp: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.ExitToApp
-w: file:///C:/Code/Repo/App/app/src/main/java/com/vital/health/ui/screens/DashboardScreen.kt:190:21 'Divider(Modifier = ..., Dp = ..., Color = ...): Unit' is deprecated. Renamed to HorizontalDivider
-w: file:///C:/Code/Repo/App/app/src/main/java/com/vital/health/ui/screens/DashboardScreen.kt:242:49 'KeyboardArrowRight: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.KeyboardArrowRight
-w: file:///C:/Code/Repo/App/app/src/main/java/com/vital/health/ui/screens/DashboardScreen.kt:244:25 'Divider(Modifier = ..., Dp = ..., Color = ...): Unit' is deprecated. Renamed to HorizontalDivider
-w: file:///C:/Code/Repo/App/app/src/main/java/com/vital/health/ui/screens/DashboardScreen.kt:249:49 'KeyboardArrowRight: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.KeyboardArrowRight
+w: file:///C:/Code/Repo/App/app/src/main/java/com/vital/health/ui/screens/DashboardScreen.kt:37:5 Parameter 'onSync' is never used
+w: file:///C:/Code/Repo/App/app/src/main/java/com/vital/health/ui/screens/DashboardScreen.kt:152:40 'ExitToApp: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.ExitToApp
+w: file:///C:/Code/Repo/App/app/src/main/java/com/vital/health/ui/screens/DashboardScreen.kt:198:21 'Divider(Modifier = ..., Dp = ..., Color = ...): Unit' is deprecated. Renamed to HorizontalDivider
+w: file:///C:/Code/Repo/App/app/src/main/java/com/vital/health/ui/screens/DashboardScreen.kt:250:49 'KeyboardArrowRight: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.KeyboardArrowRight
+w: file:///C:/Code/Repo/App/app/src/main/java/com/vital/health/ui/screens/DashboardScreen.kt:252:25 'Divider(Modifier = ..., Dp = ..., Color = ...): Unit' is deprecated. Renamed to HorizontalDivider
+w: file:///C:/Code/Repo/App/app/src/main/java/com/vital/health/ui/screens/DashboardScreen.kt:257:49 'KeyboardArrowRight: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.KeyboardArrowRight
 w: file:///C:/Code/Repo/App/app/src/main/java/com/vital/health/ui/screens/MedsScreen.kt:42:35 'ArrowBack: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.ArrowBack
-w: file:///C:/Code/Repo/App/app/src/main/java/com/vital/health/ui/screens/SettingsScreen.kt:86:31 'ExitToApp: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.ExitToApp
-w: file:///C:/Code/Repo/App/app/src/main/java/com/vital/health/ui/screens/SettingsScreen.kt:116:31 'ArrowForward: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.ArrowForward
-w: file:///C:/Code/Repo/App/app/src/main/java/com/vital/health/ui/screens/SettingsScreen.kt:120:9 'Divider(Modifier = ..., Dp = ..., Color = ...): Unit' is deprecated. Renamed to HorizontalDivider
+w: file:///C:/Code/Repo/App/app/src/main/java/com/vital/health/ui/screens/SettingsScreen.kt:122:31 'ExitToApp: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.ExitToApp
+w: file:///C:/Code/Repo/App/app/src/main/java/com/vital/health/ui/screens/SettingsScreen.kt:175:31 'ArrowForward: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.ArrowForward
+w: file:///C:/Code/Repo/App/app/src/main/java/com/vital/health/ui/screens/SettingsScreen.kt:179:9 'Divider(Modifier = ..., Dp = ..., Color = ...): Unit' is deprecated. Renamed to HorizontalDivider
 w: file:///C:/Code/Repo/App/app/src/main/java/com/vital/health/ui/screens/TrackScreen.kt:57:37 'List: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.List
 w: file:///C:/Code/Repo/App/app/src/main/java/com/vital/health/ui/screens/TrackScreen.kt:75:45 'List: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.List
 w: file:///C:/Code/Repo/App/app/src/main/java/com/vital/health/ui/screens/TrackScreen.kt:93:45 'List: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.List
@@ -39,6 +39,6 @@ You can use '--warning-mode all' to show the individual deprecation warnings and
 
 For more on this, please refer to https://docs.gradle.org/9.0.0/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
 
-BUILD SUCCESSFUL in 6s
+BUILD SUCCESSFUL in 8s
 16 actionable tasks: 3 executed, 13 up-to-date
 Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.0.0/userguide/configuration_cache_enabling.html
