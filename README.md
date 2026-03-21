@@ -13,7 +13,19 @@
 
 ---
 
-## ✨ Features
+## Screenshots
+
+| Dashboard | Trends | Journal |
+| :---: | :---: | :---: |
+| <img src="assets/Dashboard.png" width="250" alt="Home Dashboard showing daily metrics, streak counter, and vital alerts" /> | <img src="assets/Trends.png" width="250" alt="Trends analytics screen with charts, high/low summaries, and time filters" /> | <img src="assets/Journal.png" width="250" alt="Chronological health journal timeline displaying recorded vitals and notes" /> |
+
+| Medications | Settings |
+| :---: | :---: |
+| <img src="assets/Meds.png" width="250" alt="Medication tracker showing scheduled pills and refill countdowns" /> | <img src="assets/Settings.png" width="250" alt="Settings screen with profile details, health goals, and backup options" /> |
+
+---
+
+## Features
 
 ### Health Tracking
 
@@ -22,7 +34,7 @@
 | **Weight Logging**        | Track weight with kg units, averages & trend charts                  |
 | **Blood Pressure**        | Split systolic/diastolic input, status badges (Normal/Elevated/High) |
 | **Heart Rate**            | BPM logging with min/max/avg analytics and status indicators         |
-| **Mood Logging**          | Emoji-based mood picker (😄😊😐😔😢) with optional notes             |
+| **Mood Logging**          | Emoji-based mood picker with optional notes                          |
 | **Medication Management** | Mark as taken, add new prescriptions, daily/weekly/custom frequency  |
 
 ### Smart Features
