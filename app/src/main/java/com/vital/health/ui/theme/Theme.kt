@@ -1,17 +1,17 @@
 package com.vital.health.ui.theme
 
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-private val DarkColorScheme = darkColorScheme(
-    primary = AccentBlue,
-    onPrimary = PrimaryBlack,
-    secondary = DarkSurface,
+private val LightColorScheme = lightColorScheme(
+    primary = PrimaryBlack,
+    onPrimary = Color.White,
+    secondary = TanButton,
     onSecondary = TextMain,
-    background = DarkBg,
-    surface = DarkCard,
+    background = CreamBg,
+    surface = CreamCard,
     onBackground = TextMain,
     onSurface = TextMain,
     error = VitalError,
@@ -23,7 +23,7 @@ fun VitalTheme(
     content: @Composable () -> Unit
 ) {
     MaterialTheme(
-        colorScheme = DarkColorScheme,
+        colorScheme = LightColorScheme,
         typography = Typography,
         content = content
     )

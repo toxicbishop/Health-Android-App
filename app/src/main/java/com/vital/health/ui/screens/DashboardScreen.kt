@@ -47,17 +47,17 @@ fun DashboardScreen(
                     Button(
                         onClick = { preselectedType = "WEIGHT"; logBothMode = false; showLogDialog = true; showInitialOptions = false },
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = DarkSurface, contentColor = TextMain)
+                        colors = ButtonDefaults.buttonColors(containerColor = TanButton, contentColor = TextMain)
                     ) { Text("Log Weight Only") }
                     Button(
                         onClick = { preselectedType = "BLOOD_PRESSURE"; logBothMode = false; showLogDialog = true; showInitialOptions = false },
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = DarkSurface, contentColor = TextMain)
+                        colors = ButtonDefaults.buttonColors(containerColor = TanButton, contentColor = TextMain)
                     ) { Text("Log BP Only") }
                     Button(
                         onClick = { logBothMode = true; showLogDialog = true; showInitialOptions = false },
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = AccentBlue, contentColor = DarkBg)
+                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlack, contentColor = Color.White)
                     ) { Text("Log Both", fontWeight = FontWeight.Bold) }
                 }
             },
@@ -65,7 +65,7 @@ fun DashboardScreen(
             dismissButton = {
                 TextButton(onClick = { showInitialOptions = false }) { Text("Close", color = TextMuted) }
             },
-            containerColor = DarkCard
+            containerColor = CreamCard
         )
     }
 
@@ -87,13 +87,13 @@ fun DashboardScreen(
     val todayStr = remember { SimpleDateFormat("EEEE, MMMM d", Locale.getDefault()).format(Date()) }
 
     Scaffold(
-        containerColor = DarkBg,
+        containerColor = CreamBg,
         bottomBar = {
             NavigationBar(
-                containerColor = DarkBg,
+                containerColor = CreamBg,
                 contentColor = TextMuted
             ) {
-                NavigationBarItem(selected = true, onClick = { }, icon = { Icon(Icons.Filled.Home, "Home") }, label = { Text("Home") }, colors = NavigationBarItemDefaults.colors(selectedIconColor = AccentBlue, selectedTextColor = AccentBlue, indicatorColor = Color.Transparent))
+                NavigationBarItem(selected = true, onClick = { }, icon = { Icon(Icons.Filled.Home, "Home") }, label = { Text("Home") }, colors = NavigationBarItemDefaults.colors(selectedIconColor = PrimaryBlack, selectedTextColor = PrimaryBlack, indicatorColor = Color.Transparent))
                 NavigationBarItem(selected = false, onClick = { }, icon = { Icon(Icons.Outlined.AddCircle, "Meds") }, label = { Text("Meds") })
                 NavigationBarItem(selected = false, onClick = { }, icon = { Icon(Icons.Outlined.DateRange, "Vitals") }, label = { Text("Vitals") })
                 NavigationBarItem(selected = false, onClick = { }, icon = { Icon(Icons.Outlined.DateRange, "Track") }, label = { Text("Track") })
@@ -142,13 +142,13 @@ fun DashboardScreen(
             }
 
             SectionColumn("WELL-BEING") {
-                Card(colors = CardDefaults.cardColors(containerColor = DarkCard), shape = RoundedCornerShape(12.dp)) {
+                Card(colors = CardDefaults.cardColors(containerColor = CreamCard), shape = RoundedCornerShape(12.dp)) {
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(16.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Box(modifier = Modifier.size(40.dp).clip(RoundedCornerShape(8.dp)).background(DarkBg), contentAlignment = Alignment.Center) {
-                            Icon(Icons.Outlined.Face, "Mood", tint = AccentBlue)
+                        Box(modifier = Modifier.size(40.dp).clip(RoundedCornerShape(8.dp)).background(PrimaryBlack), contentAlignment = Alignment.Center) {
+                            Icon(Icons.Outlined.Face, "Mood", tint = Color.White)
                         }
                         Spacer(modifier = Modifier.width(16.dp))
                         Column(modifier = Modifier.weight(1f)) {
@@ -157,29 +157,29 @@ fun DashboardScreen(
                         }
                         Button(
                             onClick = { },
-                            colors = ButtonDefaults.buttonColors(containerColor = AccentBlue, contentColor = DarkBg),
+                            colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlack, contentColor = Color.White),
                             shape = RoundedCornerShape(8.dp)
                         ) {
                             Text("+ Log", fontWeight = FontWeight.Bold)
                         }
                     }
-                    Divider(modifier = Modifier.padding(horizontal = 16.dp), color = DarkBg, thickness = 4.dp)
+                    Divider(modifier = Modifier.padding(horizontal = 16.dp), color = CreamBg, thickness = 4.dp)
                 }
             }
 
             SectionColumn("MEDICATION") {
-                Card(colors = CardDefaults.cardColors(containerColor = DarkCard), shape = RoundedCornerShape(12.dp)) {
+                Card(colors = CardDefaults.cardColors(containerColor = CreamCard), shape = RoundedCornerShape(12.dp)) {
                     Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(modifier = Modifier.size(40.dp).clip(RoundedCornerShape(8.dp)).background(DarkBg), contentAlignment = Alignment.Center) {
-                                Icon(Icons.Outlined.ShoppingCart, "Medication", tint = AccentBlue)
+                            Box(modifier = Modifier.size(40.dp).clip(RoundedCornerShape(8.dp)).background(PrimaryBlack), contentAlignment = Alignment.Center) {
+                                Icon(Icons.Outlined.ShoppingCart, "Medication", tint = Color.White)
                             }
                             Spacer(modifier = Modifier.width(16.dp))
                             Column(modifier = Modifier.weight(1f)) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text("Active Prescriptions", color = TextMain, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Box(modifier = Modifier.background(DarkBg, RoundedCornerShape(4.dp)).padding(horizontal = 6.dp, vertical = 2.dp)) {
+                                    Box(modifier = Modifier.background(CreamBg, RoundedCornerShape(4.dp)).padding(horizontal = 6.dp, vertical = 2.dp)) {
                                         Text("1 Active", color = TextMuted, fontSize = 10.sp)
                                     }
                                 }
@@ -191,14 +191,14 @@ fun DashboardScreen(
                             Button(
                                 onClick = { },
                                 modifier = Modifier.weight(1f),
-                                colors = ButtonDefaults.buttonColors(containerColor = AccentBlue, contentColor = DarkBg),
+                                colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlack, contentColor = Color.White),
                                 shape = RoundedCornerShape(8.dp)
                             ) {
                                 Text("Mark as Taken", fontWeight = FontWeight.Bold)
                             }
                             Button(
                                 onClick = { },
-                                colors = ButtonDefaults.buttonColors(containerColor = DarkBg, contentColor = TextMain),
+                                colors = ButtonDefaults.buttonColors(containerColor = TanButton, contentColor = TextMain),
                                 shape = RoundedCornerShape(8.dp)
                             ) {
                                 Text("+ Add")
@@ -209,7 +209,7 @@ fun DashboardScreen(
             }
 
             SectionColumn("CLINICAL REPORTS") {
-                Card(colors = CardDefaults.cardColors(containerColor = DarkCard), shape = RoundedCornerShape(12.dp)) {
+                Card(colors = CardDefaults.cardColors(containerColor = CreamCard), shape = RoundedCornerShape(12.dp)) {
                     Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
                             Icon(Icons.Outlined.Info, "Report", tint = TextMuted)
@@ -217,7 +217,7 @@ fun DashboardScreen(
                             Text("Monthly Health Summary", color = TextMain, modifier = Modifier.weight(1f))
                             Icon(Icons.Outlined.KeyboardArrowRight, "Arrow", tint = TextMuted)
                         }
-                        Divider(color = DarkBg, modifier = Modifier.padding(vertical = 8.dp))
+                        Divider(color = CreamBg, modifier = Modifier.padding(vertical = 8.dp))
                         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
                             Icon(Icons.Outlined.Info, "Export", tint = TextMuted)
                             Spacer(modifier = Modifier.width(16.dp))
@@ -245,12 +245,12 @@ fun SectionColumn(title: String, content: @Composable () -> Unit) {
 fun MetricCard(modifier: Modifier = Modifier, title: String, icon: ImageVector, value: String, onLogClick: () -> Unit) {
     Card(
         modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = DarkCard),
+        colors = CardDefaults.cardColors(containerColor = CreamCard),
         shape = RoundedCornerShape(12.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Top) {
-                Icon(icon, contentDescription = null, tint = AccentBlue)
+                Icon(icon, contentDescription = null, tint = PrimaryBlack)
                 Text(title, color = TextMuted, fontSize = 12.sp, fontWeight = FontWeight.Bold)
             }
             Spacer(modifier = Modifier.height(16.dp))
@@ -260,7 +260,7 @@ fun MetricCard(modifier: Modifier = Modifier, title: String, icon: ImageVector, 
                 onClick = onLogClick,
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = TextMain),
-                border = androidx.compose.foundation.BorderStroke(1.dp, DarkSurface),
+                border = androidx.compose.foundation.BorderStroke(1.dp, TanButton),
                 shape = RoundedCornerShape(8.dp)
             ) {
                 Text("Log Entry", fontSize = 12.sp)
@@ -287,7 +287,7 @@ fun AddLogDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(if (logBothMode) "Log Both (Weight & BP)" else "Add Health Log", color = TextMain) },
-        containerColor = DarkCard,
+        containerColor = CreamCard,
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (!logBothMode) {
@@ -304,7 +304,7 @@ fun AddLogDialog(
                         singleLine = true,
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedTextColor = TextMain, unfocusedTextColor = TextMain,
-                            focusedBorderColor = AccentBlue, unfocusedBorderColor = DarkBg
+                            focusedBorderColor = PrimaryBlack, unfocusedBorderColor = TanButton
                         )
                     )
                 }
@@ -321,7 +321,7 @@ fun AddLogDialog(
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.weight(1f),
                             singleLine = true,
-                            colors = OutlinedTextFieldDefaults.colors(focusedTextColor = TextMain, unfocusedTextColor = TextMain, focusedBorderColor = AccentBlue, unfocusedBorderColor = DarkBg)
+                            colors = OutlinedTextFieldDefaults.colors(focusedTextColor = TextMain, unfocusedTextColor = TextMain, focusedBorderColor = PrimaryBlack, unfocusedBorderColor = TanButton)
                         )
                         Text("/", style = MaterialTheme.typography.headlineMedium, color = TextMuted)
                         OutlinedTextField(
@@ -331,7 +331,7 @@ fun AddLogDialog(
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.weight(1f),
                             singleLine = true,
-                            colors = OutlinedTextFieldDefaults.colors(focusedTextColor = TextMain, unfocusedTextColor = TextMain, focusedBorderColor = AccentBlue, unfocusedBorderColor = DarkBg)
+                            colors = OutlinedTextFieldDefaults.colors(focusedTextColor = TextMain, unfocusedTextColor = TextMain, focusedBorderColor = PrimaryBlack, unfocusedBorderColor = TanButton)
                         )
                     }
                 }
@@ -340,7 +340,7 @@ fun AddLogDialog(
                     value = notes,
                     onValueChange = { notes = it },
                     label = { Text("Notes (optional)", color = TextMuted) },
-                    colors = OutlinedTextFieldDefaults.colors(focusedTextColor = TextMain, unfocusedTextColor = TextMain, focusedBorderColor = AccentBlue, unfocusedBorderColor = DarkBg)
+                    colors = OutlinedTextFieldDefaults.colors(focusedTextColor = TextMain, unfocusedTextColor = TextMain, focusedBorderColor = PrimaryBlack, unfocusedBorderColor = TanButton)
                 )
             }
         },
@@ -365,7 +365,7 @@ fun AddLogDialog(
                     }
                 }
             ) {
-                Text("Save", color = AccentBlue, fontWeight = FontWeight.Bold)
+                Text("Save", color = PrimaryBlack, fontWeight = FontWeight.Bold)
             }
         },
         dismissButton = {
