@@ -141,10 +141,10 @@ fun VitalsScreenContent(logs: List<HealthLogEntity> = emptyList()) {
             periods.forEach { period ->
                 val isSelected = selectedPeriod == period
                 Box(
-                    modifier = Modifier.weight(1f).clip(RoundedCornerShape(8.dp)).then(if (isSelected) Modifier.background(PrimaryBlack) else Modifier).clickable { selectedPeriod = period }.padding(vertical = 12.dp),
+                    modifier = Modifier.weight(1f).clip(RoundedCornerShape(8.dp)).then(if (isSelected) Modifier.background(PrimaryBlack) else Modifier).clickable { selectedPeriod = period; customDateMillis = null }.padding(vertical = 12.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(period, color = if (isSelected) Color.White else TextMuted, fontWeight = FontWeight.SemiBold)
+                    Text(period, color = if (isSelected) CreamBg else TextMuted, fontWeight = FontWeight.SemiBold)
                 }
             }
         }
