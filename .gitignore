@@ -27,3 +27,6 @@ captures/
 
 # Environment
 .env
+
+# Keystore
+vital-release-key.jks
