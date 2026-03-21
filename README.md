@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🏥 VITAL Health — Android
+# VITAL Health — Android
 
 **A premium, offline-first health tracking app built with Jetpack Compose & Supabase**
 
@@ -15,37 +15,42 @@
 
 ## ✨ Features
 
-### 📊 Health Tracking
-| Feature | Description |
-|---------|-------------|
-| **Weight Logging** | Track weight with kg units, averages & trend charts |
-| **Blood Pressure** | Split systolic/diastolic input, status badges (Normal/Elevated/High) |
-| **Heart Rate** | BPM logging with min/max/avg analytics and status indicators |
-| **Mood Logging** | Emoji-based mood picker (😄😊😐😔😢) with optional notes |
-| **Medication Management** | Mark as taken, add new prescriptions, daily/weekly/custom frequency |
+### Health Tracking
 
-### 🔥 Smart Features
-| Feature | Description |
-|---------|-------------|
-| **Streak Counter** | Tracks consecutive logging days to encourage consistency |
-| **Trend Alerts** | Dismissable warnings for elevated BP or high heart rate |
-| **Refill Countdown** | Tracks remaining pills and days until refill needed |
-| **Doctor Visit Log** | Schedule and track appointments with notes |
-| **Clinical Reports** | Monthly health summary + PDF export with share intent |
+| Feature                   | Description                                                          |
+| ------------------------- | -------------------------------------------------------------------- |
+| **Weight Logging**        | Track weight with kg units, averages & trend charts                  |
+| **Blood Pressure**        | Split systolic/diastolic input, status badges (Normal/Elevated/High) |
+| **Heart Rate**            | BPM logging with min/max/avg analytics and status indicators         |
+| **Mood Logging**          | Emoji-based mood picker (😄😊😐😔😢) with optional notes             |
+| **Medication Management** | Mark as taken, add new prescriptions, daily/weekly/custom frequency  |
 
-### 📈 Trends & Analytics
+### Smart Features
+
+| Feature              | Description                                              |
+| -------------------- | -------------------------------------------------------- |
+| **Streak Counter**   | Tracks consecutive logging days to encourage consistency |
+| **Trend Alerts**     | Dismissable warnings for elevated BP or high heart rate  |
+| **Refill Countdown** | Tracks remaining pills and days until refill needed      |
+| **Doctor Visit Log** | Schedule and track appointments with notes               |
+| **Clinical Reports** | Monthly health summary + PDF export with share intent    |
+
+### Trends & Analytics
+
 - **Week / Month / Year** segmented filtering with real-time recalculation
 - **Date Picker** — filter data from a specific date onward
 - **Weight trend chart** — mini bar visualization with delta tracking
 - **BP & HR analytics** — average values with color-coded status badges
 - **Dynamic Health Insights** — pattern detection (morning vs evening BP, weight direction, HR trends)
 
-### 📓 Journal
+### Journal
+
 - **Daily health timeline** — chronological, color-coded entries
 - **Free-form health notes** — via floating action button
 - **All log types displayed** — weight, BP, HR, mood, medication, appointments
 
-### ⚙️ Settings & Account
+### Settings & Account
+
 - **Onboarding flow** — 4-step setup (Welcome → Email/Password → Name → Goals)
 - **Dark Mode** — warm espresso/charcoal palette that complements the light theme
 - **Personal Information** — edit name & profile photo (stored in Supabase Storage)
@@ -55,24 +60,24 @@
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| **Language** | Kotlin 2.0 |
-| **UI** | Jetpack Compose (Material 3) |
-| **DI** | Dagger Hilt |
-| **Local DB** | Room (SQLite) |
-| **Cloud** | Supabase Kotlin SDK v3 (Auth, Postgrest, Storage) |
-| **Network** | Ktor Client |
-| **Async** | Kotlin Coroutines & Flows |
-| **PDF** | Android PdfDocument API |
-| **Images** | Coil (async image loading) |
-| **Typography** | Playfair Display + Inter (Google Fonts) |
+| Layer          | Technology                                        |
+| -------------- | ------------------------------------------------- |
+| **Language**   | Kotlin 2.0                                        |
+| **UI**         | Jetpack Compose (Material 3)                      |
+| **DI**         | Dagger Hilt                                       |
+| **Local DB**   | Room (SQLite)                                     |
+| **Cloud**      | Supabase Kotlin SDK v3 (Auth, Postgrest, Storage) |
+| **Network**    | Ktor Client                                       |
+| **Async**      | Kotlin Coroutines & Flows                         |
+| **PDF**        | Android PdfDocument API                           |
+| **Images**     | Coil (async image loading)                        |
+| **Typography** | Playfair Display + Inter (Google Fonts)           |
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 com.vital.health/
@@ -90,7 +95,7 @@ com.vital.health/
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -121,7 +126,7 @@ com.vital.health/
 1. Open `app/src/main/java/com/vital/health/di/AppModule.kt`
 2. Replace `supabaseUrl` and `supabaseKey` with your project credentials
 
-> ⚠️ **Never commit production secrets to public repositories.**
+> **Never commit production secrets to public repositories.**
 
 ### Build & Run
 
@@ -134,7 +139,7 @@ Or simply click **Run** (Shift+F10) in Android Studio.
 
 ---
 
-## 🎨 Design
+## Design
 
 - **Light Mode**: Warm cream (`#F5F3EC`) background with black accents and tan buttons
 - **Dark Mode**: Espresso charcoal (`#1A1714`) with warm off-white text — no jarring blues
@@ -143,14 +148,15 @@ Or simply click **Run** (Shift+F10) in Android Studio.
 
 ---
 
-## 📝 Testing Note
+## Testing Note
 
 When repeatedly signing up during testing, you may hit Supabase's **Email Rate Limit**. To work around this:
+
 - Go to Supabase Dashboard → Auth → Rate Limits and increase temporarily
 - Or log in with pre-created accounts from the Supabase Dashboard
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the **GNU General Public License v3.0** — see the [LICENSE](LICENSE) file for details.
