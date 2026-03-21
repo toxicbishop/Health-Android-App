@@ -29,6 +29,15 @@ class AuthViewModel @Inject constructor(
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
 
+    val userEmail: String?
+        get() = authManager.currentUserEmail()
+        
+    val userName: String
+        get() {
+            val email = userEmail ?: return "User"
+            return email.substringBefore("@").replaceFirstChar { it.uppercase() }
+        }
+
     fun login(email: String, pass: String) {
         viewModelScope.launch {
             _isLoading.value = true

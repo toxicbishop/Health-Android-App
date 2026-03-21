@@ -29,6 +29,8 @@ import java.util.*
 @Composable
 fun DashboardScreen(
     logs: List<HealthLogEntity>,
+    userName: String = "User",
+    userEmail: String = "",
     onAddLog: (type: String, value: String, unit: String, notes: String?) -> Unit,
     onSync: () -> Unit,
     onLogout: () -> Unit
@@ -96,15 +98,31 @@ fun DashboardScreen(
             ) {
                 NavigationBarItem(selected = currentTab == "HOME", onClick = { currentTab = "HOME" }, icon = { Icon(Icons.Filled.Home, "Home") }, label = { Text("Home") }, colors = NavigationBarItemDefaults.colors(selectedIconColor = PrimaryBlack, selectedTextColor = PrimaryBlack, indicatorColor = Color.Transparent))
                 NavigationBarItem(selected = currentTab == "MEDS", onClick = { currentTab = "MEDS" }, icon = { Icon(Icons.Outlined.AddCircle, "Meds") }, label = { Text("Meds") }, colors = NavigationBarItemDefaults.colors(selectedIconColor = PrimaryBlack, selectedTextColor = PrimaryBlack, indicatorColor = Color.Transparent))
-                NavigationBarItem(selected = currentTab == "VITALS", onClick = { currentTab = "VITALS" }, icon = { Icon(Icons.Outlined.DateRange, "Vitals") }, label = { Text("Vitals") })
-                NavigationBarItem(selected = currentTab == "TRACK", onClick = { currentTab = "TRACK" }, icon = { Icon(Icons.Outlined.DateRange, "Track") }, label = { Text("Track") })
-                NavigationBarItem(selected = currentTab == "SETTINGS", onClick = { currentTab = "SETTINGS" }, icon = { Icon(Icons.Outlined.Settings, "Settings") }, label = { Text("Settings") })
+                NavigationBarItem(selected = currentTab == "VITALS", onClick = { currentTab = "VITALS" }, icon = { Icon(Icons.Outlined.DateRange, "Vitals") }, label = { Text("Vitals") }, colors = NavigationBarItemDefaults.colors(selectedIconColor = PrimaryBlack, selectedTextColor = PrimaryBlack, indicatorColor = Color.Transparent))
+                NavigationBarItem(selected = currentTab == "TRACK", onClick = { currentTab = "TRACK" }, icon = { Icon(Icons.Outlined.DateRange, "Track") }, label = { Text("Track") }, colors = NavigationBarItemDefaults.colors(selectedIconColor = PrimaryBlack, selectedTextColor = PrimaryBlack, indicatorColor = Color.Transparent))
+                NavigationBarItem(selected = currentTab == "SETTINGS", onClick = { currentTab = "SETTINGS" }, icon = { Icon(Icons.Outlined.Settings, "Settings") }, label = { Text("Settings") }, colors = NavigationBarItemDefaults.colors(selectedIconColor = PrimaryBlack, selectedTextColor = PrimaryBlack, indicatorColor = Color.Transparent))
             }
         }
     ) { padding ->
         if (currentTab == "MEDS") {
             Box(modifier = Modifier.padding(padding).fillMaxSize()) {
                 MedsScreenContent(onBack = { currentTab = "HOME" })
+            }
+        } else if (currentTab == "VITALS") {
+            Box(modifier = Modifier.padding(padding).fillMaxSize()) {
+                VitalsScreenContent()
+            }
+        } else if (currentTab == "TRACK") {
+            Box(modifier = Modifier.padding(padding).fillMaxSize()) {
+                TrackScreenContent(
+                    onLogWeight = { preselectedType = "WEIGHT"; logBothMode = false; showLogDialog = true },
+                    onLogBP = { preselectedType = "BLOOD_PRESSURE"; logBothMode = false; showLogDialog = true },
+                    onFabClick = { logBothMode = true; showLogDialog = true }
+                )
+            }
+        } else if (currentTab == "SETTINGS") {
+            Box(modifier = Modifier.padding(padding).fillMaxSize()) {
+                SettingsScreenContent(userName = userName, userEmail = userEmail, onLogout = onLogout)
             }
         } else {
             Column(

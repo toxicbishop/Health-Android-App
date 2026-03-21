@@ -18,6 +18,10 @@ class AuthManager @Inject constructor(
         return supabase.auth.currentSessionOrNull()?.user?.id
     }
 
+    fun currentUserEmail(): String? {
+        return supabase.auth.currentSessionOrNull()?.user?.email
+    }
+
     suspend fun login(userEmail: String, userPass: String) {
         supabase.auth.signInWith(Email) {
             email = userEmail

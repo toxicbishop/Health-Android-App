@@ -38,6 +38,8 @@ class MainActivity : ComponentActivity() {
                         
                         DashboardScreen(
                             logs = logs,
+                            userName = authViewModel.userName,
+                            userEmail = authViewModel.userEmail ?: "",
                             onAddLog = { type, value, unit, notes ->
                                 viewModel.addLog(type, value, unit, notes)
                             },
