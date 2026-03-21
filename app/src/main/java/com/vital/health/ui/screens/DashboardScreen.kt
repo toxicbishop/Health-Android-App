@@ -1,23 +1,29 @@
 package com.vital.health.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ExitToApp
-import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.vital.health.data.local.HealthLogEntity
 import com.vital.health.ui.theme.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,93 +33,238 @@ fun DashboardScreen(
     onSync: () -> Unit,
     onLogout: () -> Unit
 ) {
-    var showDialog by remember { mutableStateOf(false) }
+    var showInitialOptions by remember { mutableStateOf(true) }
+    var showLogDialog by remember { mutableStateOf(false) }
+    var preselectedType by remember { mutableStateOf("WEIGHT") }
+    var logBothMode by remember { mutableStateOf(false) }
 
-    if (showDialog) {
+    if (showInitialOptions) {
+        AlertDialog(
+            onDismissRequest = { showInitialOptions = false },
+            title = { Text("Log Vitals", color = TextMain) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Button(
+                        onClick = { preselectedType = "WEIGHT"; logBothMode = false; showLogDialog = true; showInitialOptions = false },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = DarkSurface, contentColor = TextMain)
+                    ) { Text("Log Weight Only") }
+                    Button(
+                        onClick = { preselectedType = "BLOOD_PRESSURE"; logBothMode = false; showLogDialog = true; showInitialOptions = false },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = DarkSurface, contentColor = TextMain)
+                    ) { Text("Log BP Only") }
+                    Button(
+                        onClick = { logBothMode = true; showLogDialog = true; showInitialOptions = false },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = AccentBlue, contentColor = DarkBg)
+                    ) { Text("Log Both", fontWeight = FontWeight.Bold) }
+                }
+            },
+            confirmButton = {},
+            dismissButton = {
+                TextButton(onClick = { showInitialOptions = false }) { Text("Close", color = TextMuted) }
+            },
+            containerColor = DarkCard
+        )
+    }
+
+    if (showLogDialog) {
         AddLogDialog(
-            onDismiss = { showDialog = false },
+            initialType = preselectedType,
+            logBothMode = logBothMode,
+            onDismiss = { showLogDialog = false },
             onSave = { type, value, unit, notes ->
                 onAddLog(type, value, unit, notes)
-                showDialog = false
+            },
+            onSaveBoth = { weight, bp, notes ->
+                if(weight.isNotBlank()) onAddLog("WEIGHT", weight, "kg", notes)
+                if(bp.isNotBlank()) onAddLog("BLOOD_PRESSURE", bp, "mmHg", notes)
             }
         )
     }
 
+    val todayStr = remember { SimpleDateFormat("EEEE, MMMM d", Locale.getDefault()).format(Date()) }
+
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("VITAL", style = MaterialTheme.typography.headlineMedium) },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = CreamBg),
-                actions = {
-                    IconButton(onClick = onSync) {
-                        Icon(Icons.Default.Refresh, contentDescription = "Sync records")
-                    }
-                    IconButton(onClick = onLogout) {
-                        Icon(Icons.Default.ExitToApp, contentDescription = "Logout")
-                    }
-                }
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { showDialog = true },
-                containerColor = PrimaryBlack,
-                contentColor = Color.White
+        containerColor = DarkBg,
+        bottomBar = {
+            NavigationBar(
+                containerColor = DarkBg,
+                contentColor = TextMuted
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Log")
+                NavigationBarItem(selected = true, onClick = { }, icon = { Icon(Icons.Filled.Home, "Home") }, label = { Text("Home") }, colors = NavigationBarItemDefaults.colors(selectedIconColor = AccentBlue, selectedTextColor = AccentBlue, indicatorColor = Color.Transparent))
+                NavigationBarItem(selected = false, onClick = { }, icon = { Icon(Icons.Outlined.AddCircle, "Meds") }, label = { Text("Meds") })
+                NavigationBarItem(selected = false, onClick = { }, icon = { Icon(Icons.Outlined.DateRange, "Vitals") }, label = { Text("Vitals") })
+                NavigationBarItem(selected = false, onClick = { }, icon = { Icon(Icons.Outlined.DateRange, "Track") }, label = { Text("Track") })
+                NavigationBarItem(selected = false, onClick = { }, icon = { Icon(Icons.Outlined.Settings, "Settings") }, label = { Text("Settings") })
             }
-        },
-        containerColor = CreamBg
+        }
     ) { padding ->
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp, vertical = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            item {
-                Text(
-                    text = "Summary",
-                    style = MaterialTheme.typography.displayLarge,
-                    modifier = Modifier.padding(vertical = 16.dp)
+            
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Column {
+                    Text("Vital Dashboard", style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold), color = TextMain)
+                    Text(todayStr, style = MaterialTheme.typography.bodyMedium, color = TextMuted)
+                }
+                Spacer(modifier = Modifier.width(16.dp))
+                IconButton(onClick = onLogout) {
+                    Icon(Icons.Default.ExitToApp, "Logout", tint = TextMuted)
+                }
+            }
+
+            val lastWeight = logs.filter { it.logType == "WEIGHT" }.maxByOrNull { it.id }?.value ?: "--"
+            val lastBp = logs.filter { it.logType == "BLOOD_PRESSURE" }.maxByOrNull { it.id }?.value ?: "--"
+
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.fillMaxWidth()) {
+                MetricCard(
+                    modifier = Modifier.weight(1f),
+                    title = "WEIGHT",
+                    icon = Icons.Outlined.Person,
+                    value = "Last: $lastWeight kg",
+                    onLogClick = { preselectedType = "WEIGHT"; logBothMode = false; showLogDialog = true }
+                )
+                MetricCard(
+                    modifier = Modifier.weight(1f),
+                    title = "BP",
+                    icon = Icons.Outlined.FavoriteBorder,
+                    value = "Last: $lastBp",
+                    onLogClick = { preselectedType = "BLOOD_PRESSURE"; logBothMode = false; showLogDialog = true }
                 )
             }
-            
-            items(logs) { log ->
-                LogCard(log)
+
+            SectionColumn("WELL-BEING") {
+                Card(colors = CardDefaults.cardColors(containerColor = DarkCard), shape = RoundedCornerShape(12.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(modifier = Modifier.size(40.dp).clip(RoundedCornerShape(8.dp)).background(DarkBg), contentAlignment = Alignment.Center) {
+                            Icon(Icons.Outlined.Face, "Mood", tint = AccentBlue)
+                        }
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text("Mood", color = TextMain, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                            Text("No mood logged today", color = TextMuted, fontSize = 14.sp)
+                        }
+                        Button(
+                            onClick = { },
+                            colors = ButtonDefaults.buttonColors(containerColor = AccentBlue, contentColor = DarkBg),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text("+ Log", fontWeight = FontWeight.Bold)
+                        }
+                    }
+                    Divider(modifier = Modifier.padding(horizontal = 16.dp), color = DarkBg, thickness = 4.dp)
+                }
             }
+
+            SectionColumn("MEDICATION") {
+                Card(colors = CardDefaults.cardColors(containerColor = DarkCard), shape = RoundedCornerShape(12.dp)) {
+                    Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(modifier = Modifier.size(40.dp).clip(RoundedCornerShape(8.dp)).background(DarkBg), contentAlignment = Alignment.Center) {
+                                Icon(Icons.Outlined.ShoppingCart, "Medication", tint = AccentBlue)
+                            }
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text("Active Prescriptions", color = TextMain, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Box(modifier = Modifier.background(DarkBg, RoundedCornerShape(4.dp)).padding(horizontal = 6.dp, vertical = 2.dp)) {
+                                        Text("1 Active", color = TextMuted, fontSize = 10.sp)
+                                    }
+                                }
+                                Text("Prenatal Vitamin • 8:00 AM", color = TextMuted, fontSize = 14.sp)
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Button(
+                                onClick = { },
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.buttonColors(containerColor = AccentBlue, contentColor = DarkBg),
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Text("Mark as Taken", fontWeight = FontWeight.Bold)
+                            }
+                            Button(
+                                onClick = { },
+                                colors = ButtonDefaults.buttonColors(containerColor = DarkBg, contentColor = TextMain),
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Text("+ Add")
+                            }
+                        }
+                    }
+                }
+            }
+
+            SectionColumn("CLINICAL REPORTS") {
+                Card(colors = CardDefaults.cardColors(containerColor = DarkCard), shape = RoundedCornerShape(12.dp)) {
+                    Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+                            Icon(Icons.Outlined.Info, "Report", tint = TextMuted)
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Text("Monthly Health Summary", color = TextMain, modifier = Modifier.weight(1f))
+                            Icon(Icons.Outlined.KeyboardArrowRight, "Arrow", tint = TextMuted)
+                        }
+                        Divider(color = DarkBg, modifier = Modifier.padding(vertical = 8.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+                            Icon(Icons.Outlined.Info, "Export", tint = TextMuted)
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Text("Export Clinical Data (PDF)", color = TextMain, modifier = Modifier.weight(1f))
+                            Icon(Icons.Outlined.KeyboardArrowRight, "Arrow", tint = TextMuted)
+                        }
+                    }
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }
 
 @Composable
-fun LogCard(log: HealthLogEntity) {
-    ElevatedCard(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.elevatedCardColors(containerColor = CreamCard)
+fun SectionColumn(title: String, content: @Composable () -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(title, color = TextMuted, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+        content()
+    }
+}
+
+@Composable
+fun MetricCard(modifier: Modifier = Modifier, title: String, icon: ImageVector, value: String, onLogClick: () -> Unit) {
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(containerColor = DarkCard),
+        shape = RoundedCornerShape(12.dp)
     ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = log.logType.replace("_", " "),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = TextMuted
-                )
-                Text(
-                    text = log.value,
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = TextMain
-                )
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Top) {
+                Icon(icon, contentDescription = null, tint = AccentBlue)
+                Text(title, color = TextMuted, fontSize = 12.sp, fontWeight = FontWeight.Bold)
             }
-            Text(
-                text = log.unit,
-                style = MaterialTheme.typography.bodyLarge,
-                color = TextDim
-            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(value, color = TextMain, fontSize = 14.sp)
+            Spacer(modifier = Modifier.height(16.dp))
+            OutlinedButton(
+                onClick = onLogClick,
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = TextMain),
+                border = androidx.compose.foundation.BorderStroke(1.dp, DarkSurface),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text("Log Entry", fontSize = 12.sp)
+            }
         }
     }
 }
@@ -121,127 +272,104 @@ fun LogCard(log: HealthLogEntity) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddLogDialog(
+    initialType: String,
+    logBothMode: Boolean,
     onDismiss: () -> Unit,
-    onSave: (type: String, value: String, unit: String, notes: String?) -> Unit
+    onSave: (type: String, value: String, unit: String, notes: String?) -> Unit,
+    onSaveBoth: (weight: String, bp: String, notes: String?) -> Unit
 ) {
-    var selectedType by remember { mutableStateOf("WEIGHT") }
-    var value by remember { mutableStateOf("") }
+    var selectedType by remember { mutableStateOf(initialType) }
+    var weightValue by remember { mutableStateOf("") }
     var systolic by remember { mutableStateOf("") }
     var diastolic by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
 
-    val logTypes = listOf("WEIGHT", "BLOOD_PRESSURE", "HEART_RATE")
-    var expanded by remember { mutableStateOf(false) }
-
-    val defaultUnit = when (selectedType) {
-        "WEIGHT" -> "kg"
-        "BLOOD_PRESSURE" -> "mmHg"
-        "HEART_RATE" -> "bpm"
-        else -> ""
-    }
-
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Add Health Log") },
+        title = { Text(if (logBothMode) "Log Both (Weight & BP)" else "Add Health Log", color = TextMain) },
+        containerColor = DarkCard,
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                ExposedDropdownMenuBox(
-                    expanded = expanded,
-                    onExpandedChange = { expanded = it }
-                ) {
-                    OutlinedTextField(
-                        value = selectedType.replace("_", " "),
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text("Log Type") },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                        modifier = Modifier.menuAnchor()
-                    )
-                    ExposedDropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false }
-                    ) {
-                        logTypes.forEach { type ->
-                            DropdownMenuItem(
-                                text = { Text(type.replace("_", " ")) },
-                                onClick = {
-                                    selectedType = type
-                                    expanded = false
-                                }
-                            )
-                        }
-                    }
+                if (!logBothMode) {
+                    Text("Type: ${selectedType.replace("_", " ")}", color = TextMuted)
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
 
-                if (selectedType == "BLOOD_PRESSURE") {
+                if (logBothMode || selectedType == "WEIGHT") {
+                    OutlinedTextField(
+                        value = weightValue,
+                        onValueChange = { if (it.isEmpty() || it.matches(Regex("^\\d{0,3}(\\.\\d{0,2})?$"))) weightValue = it },
+                        label = { Text("Weight (kg)", color = TextMuted) },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = TextMain, unfocusedTextColor = TextMain,
+                            focusedBorderColor = AccentBlue, unfocusedBorderColor = DarkBg
+                        )
+                    )
+                }
+
+                if (logBothMode || selectedType == "BLOOD_PRESSURE") {
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         OutlinedTextField(
                             value = systolic,
-                            onValueChange = { 
-                                // Regex: allow up to 3 digits only
-                                if (it.isEmpty() || it.matches(Regex("^\\d{1,3}$"))) systolic = it 
-                            },
-                            label = { Text("Systolic") },
+                            onValueChange = { if (it.isEmpty() || it.matches(Regex("^\\d{1,3}$"))) systolic = it },
+                            label = { Text("Systolic", color = TextMuted) },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.weight(1f),
-                            singleLine = true
+                            singleLine = true,
+                            colors = OutlinedTextFieldDefaults.colors(focusedTextColor = TextMain, unfocusedTextColor = TextMain, focusedBorderColor = AccentBlue, unfocusedBorderColor = DarkBg)
                         )
-                        Text("/", style = MaterialTheme.typography.headlineMedium)
+                        Text("/", style = MaterialTheme.typography.headlineMedium, color = TextMuted)
                         OutlinedTextField(
                             value = diastolic,
-                            onValueChange = { 
-                                // Regex: allow up to 3 digits only
-                                if (it.isEmpty() || it.matches(Regex("^\\d{1,3}$"))) diastolic = it 
-                            },
-                            label = { Text("Diastolic") },
+                            onValueChange = { if (it.isEmpty() || it.matches(Regex("^\\d{1,3}$"))) diastolic = it },
+                            label = { Text("Diastolic", color = TextMuted) },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.weight(1f),
-                            singleLine = true
+                            singleLine = true,
+                            colors = OutlinedTextFieldDefaults.colors(focusedTextColor = TextMain, unfocusedTextColor = TextMain, focusedBorderColor = AccentBlue, unfocusedBorderColor = DarkBg)
                         )
                     }
-                } else {
-                    OutlinedTextField(
-                        value = value,
-                        onValueChange = { 
-                            // Regex: allow up to 3 digits and optional 2 decimals
-                            if (it.isEmpty() || it.matches(Regex("^\\d{0,3}(\\.\\d{0,2})?$"))) value = it 
-                        },
-                        label = { Text("Value ($defaultUnit)") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        singleLine = true
-                    )
                 }
 
                 OutlinedTextField(
                     value = notes,
                     onValueChange = { notes = it },
-                    label = { Text("Notes (optional)") }
+                    label = { Text("Notes (optional)", color = TextMuted) },
+                    colors = OutlinedTextFieldDefaults.colors(focusedTextColor = TextMain, unfocusedTextColor = TextMain, focusedBorderColor = AccentBlue, unfocusedBorderColor = DarkBg)
                 )
             }
         },
         confirmButton = {
             TextButton(
                 onClick = {
-                    if (selectedType == "BLOOD_PRESSURE") {
-                        if (systolic.isNotBlank() && diastolic.isNotBlank()) {
-                            val bpValue = "$systolic/$diastolic"
-                            onSave(selectedType, bpValue, defaultUnit, notes.takeIf { it.isNotBlank() })
-                        }
+                    if (logBothMode) {
+                        onSaveBoth(weightValue, if(systolic.isNotBlank() && diastolic.isNotBlank()) "$systolic/$diastolic" else "", notes)
+                        onDismiss()
                     } else {
-                        if (value.isNotBlank()) {
-                            onSave(selectedType, value, defaultUnit, notes.takeIf { it.isNotBlank() })
+                        if (selectedType == "BLOOD_PRESSURE") {
+                            if (systolic.isNotBlank() && diastolic.isNotBlank()) {
+                                onSave(selectedType, "$systolic/$diastolic", "mmHg", notes.takeIf { it.isNotBlank() })
+                                onDismiss()
+                            }
+                        } else {
+                            if (weightValue.isNotBlank()) {
+                                onSave(selectedType, weightValue, "kg", notes.takeIf { it.isNotBlank() })
+                                onDismiss()
+                            }
                         }
                     }
                 }
             ) {
-                Text("Save")
+                Text("Save", color = AccentBlue, fontWeight = FontWeight.Bold)
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text("Cancel", color = TextMuted) }
         }
     )
 }

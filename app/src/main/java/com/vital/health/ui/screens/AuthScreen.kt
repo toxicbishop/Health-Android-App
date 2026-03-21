@@ -8,8 +8,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import com.vital.health.ui.theme.CreamBg
-import com.vital.health.ui.theme.PrimaryBlack
+import com.vital.health.ui.theme.DarkBg
+import com.vital.health.ui.theme.AccentBlue
+import com.vital.health.ui.theme.TextMain
+import com.vital.health.ui.theme.TextMuted
+import com.vital.health.ui.theme.DarkSurface
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,7 +27,7 @@ fun AuthScreen(
     var isSignUpMode by remember { mutableStateOf(false) }
 
     Scaffold(
-        containerColor = CreamBg
+        containerColor = DarkBg
     ) { padding ->
         Column(
             modifier = Modifier
@@ -37,13 +40,18 @@ fun AuthScreen(
             Text(
                 text = "VITAL",
                 style = MaterialTheme.typography.displayLarge,
+                color = TextMain,
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Email") },
+                label = { Text("Email", color = TextMuted) },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = TextMain, unfocusedTextColor = TextMain,
+                    focusedBorderColor = AccentBlue, unfocusedBorderColor = DarkSurface
+                ),
                 modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
                 singleLine = true
             )
@@ -51,7 +59,11 @@ fun AuthScreen(
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Password") },
+                label = { Text("Password", color = TextMuted) },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = TextMain, unfocusedTextColor = TextMain,
+                    focusedBorderColor = AccentBlue, unfocusedBorderColor = DarkSurface
+                ),
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
                 singleLine = true
@@ -71,12 +83,12 @@ fun AuthScreen(
                 },
                 modifier = Modifier.fillMaxWidth().height(50.dp),
                 enabled = !isLoading && email.isNotBlank() && password.length >= 6,
-                colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlack)
+                colors = ButtonDefaults.buttonColors(containerColor = AccentBlue, disabledContainerColor = DarkSurface)
             ) {
                 if (isLoading) {
-                    CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                    CircularProgressIndicator(color = DarkBg, modifier = Modifier.size(24.dp))
                 } else {
-                    Text(if (isSignUpMode) "Sign Up" else "Log In", color = Color.White)
+                    Text(if (isSignUpMode) "Sign Up" else "Log In", color = DarkBg)
                 }
             }
 
@@ -87,7 +99,7 @@ fun AuthScreen(
             ) {
                 Text(
                     text = if (isSignUpMode) "Already have an account? Log In" else "Don't have an account? Sign Up",
-                    color = PrimaryBlack
+                    color = AccentBlue
                 )
             }
         }
