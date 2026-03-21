@@ -85,6 +85,7 @@ fun DashboardScreen(
     }
 
     val todayStr = remember { SimpleDateFormat("EEEE, MMMM d", Locale.getDefault()).format(Date()) }
+    var currentTab by remember { mutableStateOf("HOME") }
 
     Scaffold(
         containerColor = CreamBg,
@@ -93,22 +94,27 @@ fun DashboardScreen(
                 containerColor = CreamBg,
                 contentColor = TextMuted
             ) {
-                NavigationBarItem(selected = true, onClick = { }, icon = { Icon(Icons.Filled.Home, "Home") }, label = { Text("Home") }, colors = NavigationBarItemDefaults.colors(selectedIconColor = PrimaryBlack, selectedTextColor = PrimaryBlack, indicatorColor = Color.Transparent))
-                NavigationBarItem(selected = false, onClick = { }, icon = { Icon(Icons.Outlined.AddCircle, "Meds") }, label = { Text("Meds") })
-                NavigationBarItem(selected = false, onClick = { }, icon = { Icon(Icons.Outlined.DateRange, "Vitals") }, label = { Text("Vitals") })
-                NavigationBarItem(selected = false, onClick = { }, icon = { Icon(Icons.Outlined.DateRange, "Track") }, label = { Text("Track") })
-                NavigationBarItem(selected = false, onClick = { }, icon = { Icon(Icons.Outlined.Settings, "Settings") }, label = { Text("Settings") })
+                NavigationBarItem(selected = currentTab == "HOME", onClick = { currentTab = "HOME" }, icon = { Icon(Icons.Filled.Home, "Home") }, label = { Text("Home") }, colors = NavigationBarItemDefaults.colors(selectedIconColor = PrimaryBlack, selectedTextColor = PrimaryBlack, indicatorColor = Color.Transparent))
+                NavigationBarItem(selected = currentTab == "MEDS", onClick = { currentTab = "MEDS" }, icon = { Icon(Icons.Outlined.AddCircle, "Meds") }, label = { Text("Meds") }, colors = NavigationBarItemDefaults.colors(selectedIconColor = PrimaryBlack, selectedTextColor = PrimaryBlack, indicatorColor = Color.Transparent))
+                NavigationBarItem(selected = currentTab == "VITALS", onClick = { currentTab = "VITALS" }, icon = { Icon(Icons.Outlined.DateRange, "Vitals") }, label = { Text("Vitals") })
+                NavigationBarItem(selected = currentTab == "TRACK", onClick = { currentTab = "TRACK" }, icon = { Icon(Icons.Outlined.DateRange, "Track") }, label = { Text("Track") })
+                NavigationBarItem(selected = currentTab == "SETTINGS", onClick = { currentTab = "SETTINGS" }, icon = { Icon(Icons.Outlined.Settings, "Settings") }, label = { Text("Settings") })
             }
         }
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
+        if (currentTab == "MEDS") {
+            Box(modifier = Modifier.padding(padding).fillMaxSize()) {
+                MedsScreenContent(onBack = { currentTab = "HOME" })
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 16.dp, vertical = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp)
+            ) {
             
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Column {
