@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.Face
@@ -129,8 +130,10 @@ fun getLogDisplayInfo(log: HealthLogEntity): Triple<ImageVector, Color, String> 
     return when (log.logType) {
         "WEIGHT" -> Triple(Icons.Outlined.Person, Color(0xFF6366F1), "WEIGHT")
         "BLOOD_PRESSURE" -> Triple(Icons.Outlined.Favorite, Color(0xFFEC4899), "BLOOD PRESSURE")
+        "HEART_RATE" -> Triple(Icons.Outlined.Favorite, Color(0xFFEF4444), "HEART RATE")
         "MOOD" -> Triple(Icons.Outlined.Face, Color(0xFFF59E0B), "MOOD")
         "MEDICATION" -> Triple(Icons.Outlined.ShoppingCart, Color(0xFF10B981), "MEDICATION")
+        "APPOINTMENT" -> Triple(Icons.Filled.DateRange, Color(0xFF8B5CF6), "APPOINTMENT")
         "NOTE" -> Triple(Icons.Outlined.Create, Color(0xFF8B5CF6), "HEALTH NOTE")
         else -> Triple(Icons.Outlined.Create, Color(0xFF6B7280), log.logType)
     }

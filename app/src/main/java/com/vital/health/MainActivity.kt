@@ -9,9 +9,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.vital.health.ui.screens.DashboardScreen
 import com.vital.health.ui.screens.AuthScreen
+import com.vital.health.ui.screens.OnboardingScreen
 import com.vital.health.ui.theme.VitalTheme
 import com.vital.health.ui.viewmodels.HealthViewModel
 import com.vital.health.ui.viewmodels.AuthViewModel
@@ -34,11 +38,13 @@ class MainActivity : ComponentActivity() {
                     val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
                     val isLoading by authViewModel.isLoading.collectAsState()
                     val errorMessage by authViewModel.errorMessage.collectAsState()
+                    var onboardingDone by remember { mutableStateOf(sharedPrefs.getBoolean("onboarding_done", false)) }
 
                     if (isLoggedIn) {
+                        // Logged in → show dashboard
                         val viewModel: HealthViewModel = hiltViewModel()
                         val logs by viewModel.healthLogs.collectAsState()
-                        
+
                         DashboardScreen(
                             logs = logs,
                             userName = authViewModel.userName,
@@ -53,11 +59,29 @@ class MainActivity : ComponentActivity() {
                             onSync = {
                                 viewModel.sync()
                             },
+                            onBackup = {
+                                viewModel.backup()
+                            },
+                            onRestore = {
+                                viewModel.restore()
+                            },
                             onLogout = {
                                 authViewModel.logout()
                             }
                         )
+                    } else if (!onboardingDone) {
+                        // First time → onboarding with signup
+                        OnboardingScreen(
+                            isLoading = isLoading,
+                            errorMessage = errorMessage,
+                            onComplete = { email, password, name ->
+                                authViewModel.signUp(email, password)
+                                authViewModel.updateProfile(name, null)
+                                onboardingDone = true
+                            }
+                        )
                     } else {
+                        // Returning user → login screen
                         AuthScreen(
                             isLoading = isLoading,
                             errorMessage = errorMessage,

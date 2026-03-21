@@ -45,7 +45,23 @@ fun VitalsScreenContent(logs: List<HealthLogEntity> = emptyList()) {
     val filtered = logs.filter { it.timestamp >= cutoff }
     val weightLogs = filtered.filter { it.logType == "WEIGHT" }
     val bpLogs = filtered.filter { it.logType == "BLOOD_PRESSURE" }
-    
+    val hrLogs = filtered.filter { it.logType == "HEART_RATE" }
+    val hrValues = hrLogs.mapNotNull { it.value.toIntOrNull() }
+    val avgHrVal = if (hrValues.isNotEmpty()) hrValues.average().toInt() else null
+    val minHr = hrValues.minOrNull()
+    val maxHr = hrValues.maxOrNull()
+    val hrStatus = when {
+        avgHrVal == null -> "NO DATA"
+        avgHrVal < 60 -> "LOW"
+        avgHrVal <= 100 -> "NORMAL"
+        else -> "HIGH"
+    }
+    val hrStatusColor = when (hrStatus) {
+        "LOW" -> Color(0xFF3B82F6)
+        "NORMAL" -> VitalSuccess
+        "HIGH" -> VitalError
+        else -> TextMuted
+    }
     // Weight calculations
     val weights = weightLogs.mapNotNull { it.value.toDoubleOrNull() }
     val avgWeight = if (weights.isNotEmpty()) "%.1f".format(weights.average()) else "--"
@@ -192,7 +208,7 @@ fun VitalsScreenContent(logs: List<HealthLogEntity> = emptyList()) {
         Card(colors = CardDefaults.cardColors(containerColor = CreamCard), shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) {
             Row(modifier = Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Box(modifier = Modifier.size(48.dp).clip(RoundedCornerShape(8.dp)).background(PrimaryBlack), contentAlignment = Alignment.Center) {
-                    Icon(Icons.Outlined.Favorite, "Heart", tint = Color.White)
+                    Icon(Icons.Outlined.Favorite, "Heart", tint = CreamBg)
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Column(modifier = Modifier.weight(1f)) {
@@ -200,7 +216,27 @@ fun VitalsScreenContent(logs: List<HealthLogEntity> = emptyList()) {
                     Text("Average: $avgBpStr", color = TextMuted, fontSize = 14.sp)
                 }
                 Box(modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(bpStatusColor).padding(horizontal = 8.dp, vertical = 4.dp), contentAlignment = Alignment.Center) {
-                    Text("• $bpStatus", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 10.sp)
+                    Text("• $bpStatus", color = CreamBg, fontWeight = FontWeight.Bold, fontSize = 10.sp)
+                }
+            }
+        }
+
+        // Heart Rate Card
+        Card(colors = CardDefaults.cardColors(containerColor = CreamCard), shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) {
+            Row(modifier = Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Box(modifier = Modifier.size(48.dp).clip(RoundedCornerShape(8.dp)).background(Color(0xFFEC4899)), contentAlignment = Alignment.Center) {
+                    Text("🫀", fontSize = 22.sp)
+                }
+                Spacer(modifier = Modifier.width(16.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("Heart Rate", color = TextMain, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    Text(if (avgHrVal != null) "Avg: $avgHrVal bpm" else "-- bpm", color = TextMuted, fontSize = 14.sp)
+                    if (minHr != null && maxHr != null) {
+                        Text("Range: $minHr–$maxHr bpm", color = TextMuted, fontSize = 12.sp)
+                    }
+                }
+                Box(modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(hrStatusColor).padding(horizontal = 8.dp, vertical = 4.dp), contentAlignment = Alignment.Center) {
+                    Text("• $hrStatus", color = CreamBg, fontWeight = FontWeight.Bold, fontSize = 10.sp)
                 }
             }
         }
@@ -229,7 +265,12 @@ fun VitalsScreenContent(logs: List<HealthLogEntity> = emptyList()) {
                 val direction = if (trend < 0) "downward" else "upward"
                 InsightCard(Icons.Outlined.Warning, "WEIGHT CORRELATION", "Weight shows a $direction trend of ${"%.1f".format(kotlin.math.abs(trend))} kg over this period.", if (trend < 0) VitalSuccess else VitalError)
             }
-            if (bpPairs.size < 2 && weights.size < 2) {
+            if (hrValues.size >= 2) {
+                val hrTrend = hrValues.last() - hrValues.first()
+                val hrDir = if (hrTrend < 0) "decreasing" else "increasing"
+                InsightCard(Icons.Outlined.Info, "HEART RATE TREND", "Average HR $hrDir by ${kotlin.math.abs(hrTrend)} bpm over this period.", Color(0xFFEC4899))
+            }
+            if (bpPairs.size < 2 && weights.size < 2 && hrValues.size < 2) {
                 Card(colors = CardDefaults.cardColors(containerColor = CreamCard), shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) {
                     Text("Log more data to see health insights!", color = TextMuted, modifier = Modifier.padding(16.dp), fontSize = 14.sp)
                 }

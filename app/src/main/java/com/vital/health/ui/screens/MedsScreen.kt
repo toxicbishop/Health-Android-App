@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -102,6 +103,61 @@ fun MedsScreenContent(onBack: () -> Unit) {
                     onDelete = { reminders = reminders.toMutableList().also { it.removeAt(index) } }
                 )
             }
+        }
+
+        // Refill Countdown
+        val context = LocalContext.current
+        val refillPrefs = remember { context.getSharedPreferences("refill_prefs", android.content.Context.MODE_PRIVATE) }
+        var totalPills by remember { mutableStateOf(refillPrefs.getInt("total_pills", 30)) }
+        var dailyDoses by remember { mutableStateOf(refillPrefs.getInt("daily_doses", 2)) }
+        var startDay by remember { mutableStateOf(refillPrefs.getLong("start_day", System.currentTimeMillis())) }
+        var showRefillEdit by remember { mutableStateOf(false) }
+
+        val daysSinceStart = ((System.currentTimeMillis() - startDay) / (24 * 60 * 60 * 1000)).toInt()
+        val remaining = (totalPills - daysSinceStart * dailyDoses).coerceAtLeast(0)
+        val daysLeft = if (dailyDoses > 0) remaining / dailyDoses else 0
+
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text("Refill Countdown", color = TextMain, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+            Card(colors = CardDefaults.cardColors(containerColor = CreamCard), shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) {
+                Row(modifier = Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Box(modifier = Modifier.size(48.dp).clip(RoundedCornerShape(8.dp)).background(if (daysLeft <= 5) VitalError else PrimaryBlack), contentAlignment = Alignment.Center) {
+                        Text("💊", fontSize = 22.sp)
+                    }
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("$remaining pills remaining", color = TextMain, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        Text("~$daysLeft days left ($dailyDoses/day)", color = if (daysLeft <= 5) VitalError else TextMuted, fontSize = 14.sp)
+                    }
+                    IconButton(onClick = { showRefillEdit = true }) { Icon(Icons.Outlined.Create, "Edit", tint = TextMuted, modifier = Modifier.size(20.dp)) }
+                }
+            }
+        }
+
+        if (showRefillEdit) {
+            var editTotal by remember { mutableStateOf(totalPills.toString()) }
+            var editDoses by remember { mutableStateOf(dailyDoses.toString()) }
+            AlertDialog(
+                onDismissRequest = { showRefillEdit = false },
+                title = { Text("Refill Settings", color = TextMain, fontWeight = FontWeight.Bold) },
+                text = {
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        OutlinedTextField(value = editTotal, onValueChange = { editTotal = it }, label = { Text("Total Pills") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
+                        OutlinedTextField(value = editDoses, onValueChange = { editDoses = it }, label = { Text("Doses Per Day") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
+                    }
+                },
+                confirmButton = {
+                    Button(onClick = {
+                        totalPills = editTotal.toIntOrNull() ?: 30
+                        dailyDoses = editDoses.toIntOrNull() ?: 2
+                        startDay = System.currentTimeMillis()
+                        refillPrefs.edit().putInt("total_pills", totalPills).putInt("daily_doses", dailyDoses).putLong("start_day", startDay).apply()
+                        showRefillEdit = false
+                    }, colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlack)) { Text("Save", color = CreamBg) }
+                },
+                dismissButton = { TextButton(onClick = { showRefillEdit = false }) { Text("Cancel", color = TextMuted) } },
+                containerColor = CreamCard
+            )
         }
 
         Spacer(modifier = Modifier.weight(1f, fill = false))

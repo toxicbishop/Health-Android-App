@@ -34,4 +34,16 @@ class HealthViewModel @Inject constructor(
             repository.syncWithRemote()
         }
     }
+
+    fun backup() {
+        viewModelScope.launch {
+            repository.backupToSupabase()
+        }
+    }
+
+    fun restore() {
+        viewModelScope.launch {
+            repository.restoreFromSupabase()
+        }
+    }
 }

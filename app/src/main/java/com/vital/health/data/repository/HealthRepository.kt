@@ -23,7 +23,6 @@ class HealthRepository @Inject constructor(
             notes = notes
         )
         localDao.insertLog(log)
-        // Sync logic would be called here or via WorkManager
     }
 
     suspend fun syncWithRemote() {
@@ -36,5 +35,24 @@ class HealthRepository @Inject constructor(
                 // Network error handled by WorkManager retries
             }
         }
+    }
+
+    suspend fun backupToSupabase() {
+        val unsynced = localDao.getUnsyncedLogs()
+        unsynced.forEach { log ->
+            try {
+                supabase.postgrest["health_logs"].insert(log)
+                localDao.markAsSynced(log.id)
+            } catch (_: Exception) { }
+        }
+    }
+
+    suspend fun restoreFromSupabase() {
+        try {
+            val remoteLogs = supabase.postgrest["health_logs"].select().decodeList<HealthLogEntity>()
+            remoteLogs.forEach { log ->
+                localDao.insertLog(log.copy(isSynced = true))
+            }
+        } catch (_: Exception) { }
     }
 }

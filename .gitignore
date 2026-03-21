@@ -21,3 +21,6 @@ captures/
 
 # Log files
 *.log
+
+#text files
+*.txt

@@ -18,6 +18,7 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -38,12 +39,16 @@ fun SettingsScreenContent(
     userEmail: String,
     userAvatarUrl: String?,
     onSaveProfile: (String, ByteArray?) -> Unit,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    onBackup: () -> Unit = {},
+    onRestore: () -> Unit = {}
 ) {
     val initial = if (userName.isNotEmpty()) userName.first().toString().uppercase() else "U"
     var showEditProfile by remember { mutableStateOf(false) }
     var showHealthGoals by remember { mutableStateOf(false) }
     var showNotifications by remember { mutableStateOf(false) }
+    var showBackupConfirm by remember { mutableStateOf(false) }
+    var showRestoreConfirm by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     val sharedPrefs = remember { context.getSharedPreferences("vital_prefs", Context.MODE_PRIVATE) }
@@ -87,7 +92,9 @@ fun SettingsScreenContent(
                     onCheckedChange = { isAppDarkMode = it; sharedPrefs.edit().putBoolean("dark_mode", it).apply() }
                 )
                 SettingsItem(icon = Icons.Outlined.Info, label = "Health Goals", isToggle = false, hasBorder = true, onClick = { showHealthGoals = true })
-                SettingsItem(icon = Icons.Outlined.Notifications, label = "Notifications", isToggle = false, hasBorder = false, onClick = { showNotifications = true })
+                SettingsItem(icon = Icons.Outlined.Notifications, label = "Notifications", isToggle = false, hasBorder = true, onClick = { showNotifications = true })
+                SettingsItem(icon = Icons.Outlined.Refresh, label = "Backup Data", isToggle = false, hasBorder = true, onClick = { showBackupConfirm = true })
+                SettingsItem(icon = Icons.Outlined.Refresh, label = "Restore Data", isToggle = false, hasBorder = false, onClick = { showRestoreConfirm = true })
             }
         }
 
@@ -115,6 +122,26 @@ fun SettingsScreenContent(
     }
     if (showNotifications) {
         NotificationsDialog(onDismiss = { showNotifications = false })
+    }
+    if (showBackupConfirm) {
+        AlertDialog(
+            onDismissRequest = { showBackupConfirm = false },
+            title = { Text("Backup Data", color = TextMain, fontWeight = FontWeight.Bold) },
+            text = { Text("Upload all unsynced health logs to cloud?", color = TextMuted) },
+            confirmButton = { Button(onClick = { onBackup(); showBackupConfirm = false }, colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlack)) { Text("Backup", color = CreamBg) } },
+            dismissButton = { TextButton(onClick = { showBackupConfirm = false }) { Text("Cancel", color = TextMuted) } },
+            containerColor = CreamCard
+        )
+    }
+    if (showRestoreConfirm) {
+        AlertDialog(
+            onDismissRequest = { showRestoreConfirm = false },
+            title = { Text("Restore Data", color = TextMain, fontWeight = FontWeight.Bold) },
+            text = { Text("Download all health logs from cloud? This won't delete existing data.", color = TextMuted) },
+            confirmButton = { Button(onClick = { onRestore(); showRestoreConfirm = false }, colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlack)) { Text("Restore", color = CreamBg) } },
+            dismissButton = { TextButton(onClick = { showRestoreConfirm = false }) { Text("Cancel", color = TextMuted) } },
+            containerColor = CreamCard
+        )
     }
 }
 

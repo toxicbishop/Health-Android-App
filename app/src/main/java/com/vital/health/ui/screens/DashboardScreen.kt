@@ -44,6 +44,8 @@ fun DashboardScreen(
     onSaveProfile: (String, ByteArray?) -> Unit = { _, _ -> },
     onAddLog: (type: String, value: String, unit: String, notes: String?) -> Unit,
     onSync: () -> Unit,
+    onBackup: () -> Unit = {},
+    onRestore: () -> Unit = {},
     onLogout: () -> Unit
 ) {
     var showInitialOptions by remember { mutableStateOf(true) }
@@ -53,6 +55,8 @@ fun DashboardScreen(
     var showMoodDialog by remember { mutableStateOf(false) }
     var showAddMedDialog by remember { mutableStateOf(false) }
     var showMonthlySummary by remember { mutableStateOf(false) }
+    var showHrDialog by remember { mutableStateOf(false) }
+    var showAppointmentDialog by remember { mutableStateOf(false) }
     var medTaken by remember { mutableStateOf(false) }
 
     if (showInitialOptions) {
@@ -89,6 +93,12 @@ fun DashboardScreen(
     if (showMonthlySummary) {
         MonthlySummaryDialog(logs = logs, onDismiss = { showMonthlySummary = false })
     }
+    if (showHrDialog) {
+        HeartRateDialog(onDismiss = { showHrDialog = false }, onSave = { bpm, notes -> onAddLog("HEART_RATE", bpm, "bpm", notes) })
+    }
+    if (showAppointmentDialog) {
+        AppointmentDialog(onDismiss = { showAppointmentDialog = false }, onSave = { doctor, date, notes -> onAddLog("APPOINTMENT", doctor, "visit", "$date • $notes") })
+    }
 
     val todayStr = remember { SimpleDateFormat("EEEE, MMMM d", Locale.getDefault()).format(Date()) }
     var currentTab by remember { mutableStateOf("HOME") }
@@ -107,7 +117,7 @@ fun DashboardScreen(
             NavigationBar(containerColor = CreamCard, contentColor = TextMuted) {
                 NavigationBarItem(selected = currentTab == "HOME", onClick = { currentTab = "HOME" }, icon = { Icon(Icons.Filled.Home, "Home") }, label = { Text("Home") }, colors = NavigationBarItemDefaults.colors(selectedIconColor = PrimaryBlack, selectedTextColor = PrimaryBlack, unselectedIconColor = TextMuted, unselectedTextColor = TextMuted, indicatorColor = TanButton))
                 NavigationBarItem(selected = currentTab == "MEDS", onClick = { currentTab = "MEDS" }, icon = { Icon(Icons.Outlined.AddCircle, "Meds") }, label = { Text("Meds") }, colors = NavigationBarItemDefaults.colors(selectedIconColor = PrimaryBlack, selectedTextColor = PrimaryBlack, unselectedIconColor = TextMuted, unselectedTextColor = TextMuted, indicatorColor = TanButton))
-                NavigationBarItem(selected = currentTab == "TRENDS", onClick = { currentTab = "TRENDS" }, icon = { Icon(Icons.Outlined.DateRange, "Trends") }, label = { Text("Trends") }, colors = NavigationBarItemDefaults.colors(selectedIconColor = PrimaryBlack, selectedTextColor = PrimaryBlack, unselectedIconColor = TextMuted, unselectedTextColor = TextMuted, indicatorColor = TanButton))
+                NavigationBarItem(selected = currentTab == "TRENDS", onClick = { currentTab = "TRENDS" }, icon = { Icon(Icons.Filled.DateRange, "Trends") }, label = { Text("Trends") }, colors = NavigationBarItemDefaults.colors(selectedIconColor = PrimaryBlack, selectedTextColor = PrimaryBlack, unselectedIconColor = TextMuted, unselectedTextColor = TextMuted, indicatorColor = TanButton))
                 NavigationBarItem(selected = currentTab == "JOURNAL", onClick = { currentTab = "JOURNAL" }, icon = { Icon(Icons.Outlined.Create, "Journal") }, label = { Text("Journal") }, colors = NavigationBarItemDefaults.colors(selectedIconColor = PrimaryBlack, selectedTextColor = PrimaryBlack, unselectedIconColor = TextMuted, unselectedTextColor = TextMuted, indicatorColor = TanButton))
                 NavigationBarItem(selected = currentTab == "SETTINGS", onClick = { currentTab = "SETTINGS" }, icon = { Icon(Icons.Outlined.Settings, "Settings") }, label = { Text("Settings") }, colors = NavigationBarItemDefaults.colors(selectedIconColor = PrimaryBlack, selectedTextColor = PrimaryBlack, unselectedIconColor = TextMuted, unselectedTextColor = TextMuted, indicatorColor = TanButton))
             }
@@ -123,7 +133,7 @@ fun DashboardScreen(
                 )
             }
             "SETTINGS" -> Box(modifier = Modifier.padding(padding).fillMaxSize()) {
-                SettingsScreenContent(userName = userName, userEmail = userEmail, userAvatarUrl = userAvatarUrl, onSaveProfile = onSaveProfile, onLogout = onLogout)
+                SettingsScreenContent(userName = userName, userEmail = userEmail, userAvatarUrl = userAvatarUrl, onSaveProfile = onSaveProfile, onLogout = onLogout, onBackup = onBackup, onRestore = onRestore)
             }
             else -> {
                 // HOME TAB
@@ -140,12 +150,75 @@ fun DashboardScreen(
                         IconButton(onClick = onLogout) { Icon(Icons.Default.ExitToApp, "Logout", tint = TextMuted) }
                     }
 
+                    // STREAK
+                    val streak = remember(logs) {
+                        var count = 0
+                        val cal = Calendar.getInstance()
+                        while (true) {
+                            val dayStart = cal.clone() as Calendar
+                            dayStart.set(Calendar.HOUR_OF_DAY, 0); dayStart.set(Calendar.MINUTE, 0); dayStart.set(Calendar.SECOND, 0)
+                            val dayEnd = cal.clone() as Calendar
+                            dayEnd.set(Calendar.HOUR_OF_DAY, 23); dayEnd.set(Calendar.MINUTE, 59); dayEnd.set(Calendar.SECOND, 59)
+                            val hasLog = logs.any { it.timestamp in dayStart.timeInMillis..dayEnd.timeInMillis }
+                            if (hasLog) { count++; cal.add(Calendar.DAY_OF_YEAR, -1) } else break
+                        }
+                        count
+                    }
+                    if (streak > 0) {
+                        Card(colors = CardDefaults.cardColors(containerColor = CreamCard), shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) {
+                            Row(modifier = Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                                Text("🔥", fontSize = 28.sp)
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column {
+                                    Text("$streak-day logging streak", color = TextMain, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                                    Text("Keep it up! Consistency is key.", color = TextMuted, fontSize = 12.sp)
+                                }
+                            }
+                        }
+                    }
+
+                    // TREND ALERTS
+                    val recentBpLogs = logs.filter { it.logType == "BLOOD_PRESSURE" && it.timestamp >= System.currentTimeMillis() - 3 * 24 * 60 * 60 * 1000 }
+                    val elevatedBpDays = recentBpLogs.mapNotNull { it.value.split("/").firstOrNull()?.toIntOrNull() }.count { it >= 130 }
+                    val recentHrLogs = logs.filter { it.logType == "HEART_RATE" && it.timestamp >= System.currentTimeMillis() - 7 * 24 * 60 * 60 * 1000 }
+                    val avgHr = recentHrLogs.mapNotNull { it.value.toIntOrNull() }.let { if (it.isNotEmpty()) it.average().toInt() else null }
+                    var dismissedAlerts by remember { mutableStateOf(setOf<String>()) }
+
+                    if (elevatedBpDays >= 2 && "bp" !in dismissedAlerts) {
+                        Card(colors = CardDefaults.cardColors(containerColor = Color(0xFF3D1F1F)), shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) {
+                            Row(modifier = Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                                Text("⚠️", fontSize = 24.sp)
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text("BP Alert", color = Color(0xFFFF6B6B), fontWeight = FontWeight.Bold)
+                                    Text("Systolic ≥130 in $elevatedBpDays of last 3 logs", color = Color(0xFFFFAAAA), fontSize = 13.sp)
+                                }
+                                IconButton(onClick = { dismissedAlerts = dismissedAlerts + "bp" }) { Icon(Icons.Filled.Close, "Dismiss", tint = Color(0xFFFF6B6B)) }
+                            }
+                        }
+                    }
+                    if (avgHr != null && avgHr > 100 && "hr" !in dismissedAlerts) {
+                        Card(colors = CardDefaults.cardColors(containerColor = Color(0xFF3D2E1F)), shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) {
+                            Row(modifier = Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                                Text("💓", fontSize = 24.sp)
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text("Heart Rate Alert", color = Color(0xFFFFB347), fontWeight = FontWeight.Bold)
+                                    Text("Average HR this week: $avgHr bpm (above 100)", color = Color(0xFFFFDDA0), fontSize = 13.sp)
+                                }
+                                IconButton(onClick = { dismissedAlerts = dismissedAlerts + "hr" }) { Icon(Icons.Filled.Close, "Dismiss", tint = Color(0xFFFFB347)) }
+                            }
+                        }
+                    }
+
                     val lastWeight = logs.filter { it.logType == "WEIGHT" }.maxByOrNull { it.id }?.value ?: "--"
                     val lastBp = logs.filter { it.logType == "BLOOD_PRESSURE" }.maxByOrNull { it.id }?.value ?: "--"
+                    val lastHr = logs.filter { it.logType == "HEART_RATE" }.maxByOrNull { it.id }?.value ?: "--"
 
-                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.fillMaxWidth()) {
-                        MetricCard(modifier = Modifier.weight(1f), title = "WEIGHT", icon = Icons.Outlined.Person, value = "Last: $lastWeight kg", onLogClick = { preselectedType = "WEIGHT"; logBothMode = false; showLogDialog = true })
-                        MetricCard(modifier = Modifier.weight(1f), title = "BP", icon = Icons.Outlined.FavoriteBorder, value = "Last: $lastBp", onLogClick = { preselectedType = "BLOOD_PRESSURE"; logBothMode = false; showLogDialog = true })
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+                        MetricCard(modifier = Modifier.weight(1f), title = "WEIGHT", icon = Icons.Outlined.Person, value = "$lastWeight kg", onLogClick = { preselectedType = "WEIGHT"; logBothMode = false; showLogDialog = true })
+                        MetricCard(modifier = Modifier.weight(1f), title = "BP", icon = Icons.Outlined.FavoriteBorder, value = lastBp, onLogClick = { preselectedType = "BLOOD_PRESSURE"; logBothMode = false; showLogDialog = true })
+                        MetricCard(modifier = Modifier.weight(1f), title = "HR", icon = Icons.Outlined.FavoriteBorder, value = "$lastHr bpm", onLogClick = { showHrDialog = true })
                     }
 
                     // WELL-BEING
@@ -233,6 +306,31 @@ fun DashboardScreen(
                                     Spacer(modifier = Modifier.width(16.dp))
                                     Text("Export Clinical Data (PDF)", color = TextMain, modifier = Modifier.weight(1f))
                                     Icon(Icons.Outlined.KeyboardArrowRight, "Arrow", tint = TextMuted)
+                                }
+                            }
+                        }
+                    }
+
+                    // APPOINTMENTS
+                    val nextAppointment = logs.filter { it.logType == "APPOINTMENT" }.maxByOrNull { it.timestamp }
+                    SectionColumn("APPOINTMENTS") {
+                        Card(colors = CardDefaults.cardColors(containerColor = CreamCard), shape = RoundedCornerShape(12.dp)) {
+                            Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Box(modifier = Modifier.size(40.dp).clip(RoundedCornerShape(8.dp)).background(PrimaryBlack), contentAlignment = Alignment.Center) {
+                                        Icon(Icons.Filled.DateRange, "Appointment", tint = CreamBg)
+                                    }
+                                    Spacer(modifier = Modifier.width(16.dp))
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text("Doctor Visits", color = TextMain, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                                        Text(
+                                            if (nextAppointment != null) "${nextAppointment.value} • ${nextAppointment.notes ?: ""}" else "No upcoming visits",
+                                            color = TextMuted, fontSize = 14.sp
+                                        )
+                                    }
+                                    Button(onClick = { showAppointmentDialog = true }, colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlack, contentColor = CreamBg), shape = RoundedCornerShape(8.dp)) {
+                                        Text("+ Add", fontWeight = FontWeight.Bold)
+                                    }
                                 }
                             }
                         }
@@ -477,5 +575,53 @@ fun AddLogDialog(
             }) { Text("Save", color = PrimaryBlack, fontWeight = FontWeight.Bold) }
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel", color = TextMuted) } }
+    )
+}
+
+// --- Heart Rate Dialog ---
+@Composable
+fun HeartRateDialog(onDismiss: () -> Unit, onSave: (String, String?) -> Unit) {
+    var bpm by remember { mutableStateOf("") }
+    var notes by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Log Heart Rate", color = TextMain, fontWeight = FontWeight.Bold) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                OutlinedTextField(value = bpm, onValueChange = { if (it.isEmpty() || (it.matches(Regex("^\\d{1,3}$")) && (it.toIntOrNull() ?: 0) <= 220)) bpm = it }, label = { Text("BPM (40-220)") }, modifier = Modifier.fillMaxWidth(), singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
+                OutlinedTextField(value = notes, onValueChange = { notes = it }, label = { Text("Notes (optional)") }, modifier = Modifier.fillMaxWidth())
+            }
+        },
+        confirmButton = {
+            Button(onClick = { if (bpm.isNotBlank()) { onSave(bpm, notes.takeIf { it.isNotBlank() }); onDismiss() } }, colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlack)) { Text("Save", color = CreamBg) }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel", color = TextMuted) } },
+        containerColor = CreamCard
+    )
+}
+
+// --- Appointment Dialog ---
+@Composable
+fun AppointmentDialog(onDismiss: () -> Unit, onSave: (String, String, String) -> Unit) {
+    var doctor by remember { mutableStateOf("") }
+    var date by remember { mutableStateOf("") }
+    var notes by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Add Appointment", color = TextMain, fontWeight = FontWeight.Bold) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                OutlinedTextField(value = doctor, onValueChange = { doctor = it }, label = { Text("Doctor Name") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
+                OutlinedTextField(value = date, onValueChange = { date = it }, label = { Text("Date (e.g. Mar 25, 2026)") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
+                OutlinedTextField(value = notes, onValueChange = { notes = it }, label = { Text("Notes (optional)") }, modifier = Modifier.fillMaxWidth())
+            }
+        },
+        confirmButton = {
+            Button(onClick = { if (doctor.isNotBlank()) { onSave(doctor, date, notes); onDismiss() } }, colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlack)) { Text("Save", color = CreamBg) }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel", color = TextMuted) } },
+        containerColor = CreamCard
     )
 }
