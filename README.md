@@ -91,7 +91,19 @@
 
 ## Architecture
 
-```
+The app is built with a separated architecture that isolates UI logic from Data handling, improving testability and code maintainability:
+
+- **UI Layer**: Built entirely with Jetpack Compose, consisting of `Screens` that consume states exposed by scoped `ViewModels`.
+- **Data Layer**: Centralized through a `HealthRepository` that mediates between the **Local DB** (Room SQLite for offline-first capabilities) and the **Remote API** (Supabase for cloud sync and authentication).
+- **DI Layer**: Dagger Hilt manages application-wide dependencies such as database instances and Auth managers.
+- **Entry Point**: `MainActivity` serves as the host for Compose Navigation routing.
+
+![Architecture Diagram](Architecture.svg)
+
+> **Want to modify the Architecture Diagram?** 
+> You can download the [`Architecture.drawio`](Architecture.drawio) file from the root directory and use the [Draw.io Integration extension](https://marketplace.visualstudio.com/items?itemName=hediet.vscode-drawio) in VS Code or [app.diagrams.net](https://app.diagrams.net/) to easily view and edit it interactively.
+
+```text
 com.vital.health/
 ├── data/
 │   ├── local/           # Room DB (HealthLogEntity, HealthLogDao, VitalDatabase)
